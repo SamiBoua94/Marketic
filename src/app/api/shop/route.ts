@@ -71,8 +71,8 @@ export async function PUT(request: NextRequest) {
 
         const data = await request.json();
 
-        // Remove id and userId from update data to prevent tampering
-        const { id, userId, ...updateData } = data;
+        // Remove id, userId, and user relation from update data to prevent errors
+        const { id, userId, user, createdAt, updatedAt, ...updateData } = data;
 
         const shop = await prisma.shop.update({
             where: { userId: session.id },

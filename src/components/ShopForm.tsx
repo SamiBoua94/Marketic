@@ -14,6 +14,10 @@ interface ShopData {
     profilePicture: string | null;
     bannerPicture: string | null;
     certificationPicture: string | null;
+    siret?: string;
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
 }
 
 interface ShopFormProps {
@@ -39,7 +43,12 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
         phone: '',
         profilePicture: null,
         bannerPicture: null,
-        certificationPicture: null
+        bannerPicture: null,
+        certificationPicture: null,
+        siret: '',
+        instagram: '',
+        facebook: '',
+        twitter: ''
     });
 
     const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -292,6 +301,78 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                 {data.description || <span className="text-zinc-400 italic">Aucune description</span>}
                             </p>
                         )}
+                    </div>
+
+                    {/* Additional Info: SIRET & Socials */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        {/* SIRET */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Numéro SIRET</label>
+                            {isEditMode ? (
+                                <input
+                                    type="text"
+                                    value={data.siret || ''}
+                                    onChange={(e) => setData(prev => ({ ...prev, siret: e.target.value }))}
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    placeholder="123 456 789 00012"
+                                />
+                            ) : (
+                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.siret || '-'}</p>
+                            )}
+                        </div>
+
+                        {/* Social Networks */}
+                        <div className="space-y-4">
+                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block">Réseaux Sociaux</label>
+
+                            {/* Instagram */}
+                            <div className="flex items-center gap-2">
+                                <span className="w-24 text-sm text-zinc-500">Instagram</span>
+                                {isEditMode ? (
+                                    <input
+                                        type="text"
+                                        value={data.instagram || ''}
+                                        onChange={(e) => setData(prev => ({ ...prev, instagram: e.target.value }))}
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="@mon_instagram"
+                                    />
+                                ) : (
+                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.instagram || '-'}</p>
+                                )}
+                            </div>
+
+                            {/* Facebook */}
+                            <div className="flex items-center gap-2">
+                                <span className="w-24 text-sm text-zinc-500">Facebook</span>
+                                {isEditMode ? (
+                                    <input
+                                        type="text"
+                                        value={data.facebook || ''}
+                                        onChange={(e) => setData(prev => ({ ...prev, facebook: e.target.value }))}
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="facebook.com/ma.boutique"
+                                    />
+                                ) : (
+                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.facebook || '-'}</p>
+                                )}
+                            </div>
+
+                            {/* Twitter */}
+                            <div className="flex items-center gap-2">
+                                <span className="w-24 text-sm text-zinc-500">Twitter (X)</span>
+                                {isEditMode ? (
+                                    <input
+                                        type="text"
+                                        value={data.twitter || ''}
+                                        onChange={(e) => setData(prev => ({ ...prev, twitter: e.target.value }))}
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="@mon_twitter"
+                                    />
+                                ) : (
+                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.twitter || '-'}</p>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Certification Section */}
