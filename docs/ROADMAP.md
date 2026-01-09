@@ -14,11 +14,11 @@ Ce document récapitule l'état actuel du projet et les fonctionnalités restant
 - [X] **Certificat de conformité** : Emplacement pour le QR Code (Actuellement une image simple).
 
 ### 🚀 À implémenter
-- [ ] **Gestion des articles (Produits)** :
-    - [ ] Création du modèle `Product` dans la base de données.
-    - [ ] Bouton "Ajouter un article" dans l'espace boutique.
-    - [ ] Formulaire d'ajout d'article (Nom, Prix, Description, Stock, Images).
-    - [ ] Liste des articles existants avec option Modifier / Supprimer.
+- [X] **Gestion des articles (Produits)** :
+    - [X] Création du modèle `Product` dans la base de données.
+    - [X] Bouton "Ajouter un article" dans l'espace boutique.
+    - [X] Formulaire d'ajout d'article (Nom, Prix, Description, Stock, Images).
+    - [X] Liste des articles existants avec option Modifier / Supprimer.
 
 ## 2. Profil Utilisateur
 

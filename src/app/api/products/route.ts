@@ -1,0 +1,68 @@
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(request: NextRequest) {
+    try {
+        const session = await getSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+        }
+
+        const shop = await prisma.shop.findUnique({
+            where: { userId: session.id },
+            include: { products: true } // Include products in the response
+        });
+
+        if (!shop) {
+            return NextResponse.json({ error: 'Boutique introuvable' }, { status: 404 });
+        }
+
+        return NextResponse.json({ products: shop.products });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    }
+}
+
+export async function POST(request: NextRequest) {
+    try {
+        const session = await getSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+        }
+
+        const shop = await prisma.shop.findUnique({
+            where: { userId: session.id },
+        });
+
+        if (!shop) {
+            return NextResponse.json({ error: 'Boutique introuvable' }, { status: 404 });
+        }
+
+        const data = await request.json();
+
+        // Validation
+        if (!data.name || !data.price || !data.description) {
+            return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
+        }
+
+        const product = await prisma.product.create({
+            data: {
+                name: data.name,
+                description: data.description,
+                price: parseFloat(data.price),
+                stock: parseInt(data.stock || '0', 10),
+                images: data.images ? JSON.stringify(data.images) : null, // Store as JSON string or handle appropriately
+                category: data.category,
+                shopId: shop.id
+            }
+        });
+
+        return NextResponse.json({ product });
+    } catch (error) {
+        console.error('Error creating product:', error);
+        return NextResponse.json({ error: 'Erreur lors de la création du produit' }, { status: 500 });
+    }
+}

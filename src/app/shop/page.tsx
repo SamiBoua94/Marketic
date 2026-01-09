@@ -2,29 +2,65 @@
 
 import { useEffect, useState } from 'react';
 import ShopForm from '@/components/ShopForm';
+import ProductForm from '@/components/shop/ProductForm';
+import ProductList from '@/components/shop/ProductList';
 import { Loader2, Store } from 'lucide-react';
 
 export default function ShopPage() {
     const [loading, setLoading] = useState(true);
     const [shop, setShop] = useState<any>(null);
+    const [products, setProducts] = useState<any[]>([]);
 
-    const fetchShop = async () => {
+    // Product Management State
+    const [showProductForm, setShowProductForm] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<any>(null);
+
+    const fetchShopAndProducts = async () => {
         try {
-            const res = await fetch('/api/shop');
-            if (res.ok) {
-                const data = await res.json();
-                setShop(data.shop);
+            // Fetch Shop (which now includes products via the updated API)
+            const res = await fetch('/api/products'); // We use the products endpoint to get products list directly or modify shop endpoint
+            // Actually, let's keep it simple. The shop endpoint returns shop data.
+            // But we need products.
+
+            // Let's call /api/products (GET) which returns { products: [] }
+            const productsRes = await fetch('/api/products');
+            if (productsRes.ok) {
+                const productsData = await productsRes.json();
+                setProducts(productsData.products || []);
             }
+
+            // Also fetch basic shop info if needed, but maybe /api/products returns what we need?
+            // The previous code fetched /api/shop. Let's do both or consolidate.
+            const shopRes = await fetch('/api/shop');
+            if (shopRes.ok) {
+                const shopData = await shopRes.json();
+                setShop(shopData.shop);
+            }
+
         } catch (error) {
-            console.error('Error fetching shop:', error);
+            console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchShop();
+        fetchShopAndProducts();
     }, []);
+
+    const handleDeleteProduct = async (id: string) => {
+        try {
+            const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchShopAndProducts();
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('Erreur lors de la suppression');
+        }
+    };
 
     if (loading) {
         return (
@@ -36,7 +72,8 @@ export default function ShopPage() {
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto space-y-8">
+                {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
                         <Store className="text-blue-600" />
@@ -49,11 +86,56 @@ export default function ShopPage() {
                     </p>
                 </div>
 
+                {/* Shop Info Form */}
                 <ShopForm
                     initialData={shop}
-                    isEditing={!!shop}
-                    onSuccess={fetchShop}
+                    isEditing={!!shop} // Force edit mode if no shop exists
+                    onSuccess={fetchShopAndProducts}
                 />
+
+                {/* Product Management Section (Only if shop exists) */}
+                {shop && (
+                    <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Mes Articles</h2>
+                            <button
+                                onClick={() => {
+                                    setEditingProduct(null);
+                                    setShowProductForm(true);
+                                }}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                            >
+                                <span>+</span> Ajouter un article
+                            </button>
+                        </div>
+
+                        {showProductForm ? (
+                            <div className="mb-8">
+                                <ProductForm
+                                    initialData={editingProduct}
+                                    onSuccess={() => {
+                                        setShowProductForm(false);
+                                        setEditingProduct(null);
+                                        fetchShopAndProducts();
+                                    }}
+                                    onCancel={() => {
+                                        setShowProductForm(false);
+                                        setEditingProduct(null);
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <ProductList
+                                products={products}
+                                onEdit={(product) => {
+                                    setEditingProduct(product);
+                                    setShowProductForm(true);
+                                }}
+                                onDelete={handleDeleteProduct}
+                            />
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
