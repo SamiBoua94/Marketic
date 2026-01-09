@@ -8,10 +8,10 @@ Ce document récapitule l'état actuel du projet et les fonctionnalités restant
 - [x] **Système d'ouverture de boutique** : Le lien dynamique "Ouvrir ma boutique" / "Gérer ma boutique" dans le menu profil est présent.
 - [x] **Formulaire de création** : Présent avec Nom, Description, Adresse, Email, Téléphone.
 - [x] **Gestion des images** : Upload de la photo de profil, bannière et certificat (Prisma OK, Formulaire OK).
-- [ ] **Champs légaux et contact** :
-    - [ ] Ajout du champ **N° SIRET**.
-    - [ ] Ajout des champs **Réseaux sociaux** (Instagram, Facebook, etc.).
-- [ ] **Certificat de conformité** : Emplacement pour le QR Code (Actuellement une image simple).
+- [X] **Champs légaux et contact** :
+    - [X] Ajout du champ **N° SIRET**.
+    - [X] Ajout des champs **Réseaux sociaux** (Instagram, Facebook, etc.).
+- [X] **Certificat de conformité** : Emplacement pour le QR Code (Actuellement une image simple).
 
 ### 🚀 À implémenter
 - [ ] **Gestion des articles (Produits)** :
