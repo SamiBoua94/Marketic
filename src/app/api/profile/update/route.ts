@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { userStore } from '@/lib/user-store';
+import { prisma } from '@/lib/prisma';
 
 export async function PUT(request: NextRequest) {
     try {
@@ -15,10 +15,14 @@ export async function PUT(request: NextRequest) {
 
         const { name, description, profilePicture } = await request.json();
 
-        const user = userStore.update(session.id, {
-            ...(name && { name }),
-            ...(description !== undefined && { description }),
-            ...(profilePicture !== undefined && { profilePicture }),
+        // Update user
+        const user = await prisma.user.update({
+            where: { id: session.id },
+            data: {
+                ...(name && { name }),
+                ...(description !== undefined && { description }),
+                ...(profilePicture !== undefined && { profilePicture }),
+            }
         });
 
         if (!user) {
@@ -28,6 +32,11 @@ export async function PUT(request: NextRequest) {
             );
         }
 
+        const shop = await prisma.shop.findUnique({
+            where: { userId: session.id },
+            select: { id: true }
+        });
+
         return NextResponse.json({
             user: {
                 id: user.id,
@@ -36,6 +45,7 @@ export async function PUT(request: NextRequest) {
                 profilePicture: user.profilePicture,
                 description: user.description,
                 createdAt: user.createdAt,
+                hasShop: !!shop,
             },
         });
     } catch (error) {

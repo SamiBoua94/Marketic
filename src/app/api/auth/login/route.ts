@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { userStore } from '@/lib/user-store';
 import { createToken, setAuthCookie } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
     try {
@@ -15,7 +15,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Find user
-        const user = userStore.findByEmail(email);
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
 
         if (!user) {
             return NextResponse.json(
@@ -50,6 +52,10 @@ export async function POST(request: NextRequest) {
                 profilePicture: user.profilePicture,
                 description: user.description,
                 createdAt: user.createdAt,
+                hasShop: !!(await prisma.shop.findUnique({
+                    where: { userId: user.id },
+                    select: { id: true }
+                })),
             },
         });
     } catch (error) {

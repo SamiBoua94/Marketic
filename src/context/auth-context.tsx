@@ -9,6 +9,7 @@ export interface User {
     profilePicture: string | null;
     description: string | null;
     createdAt: string;
+    hasShop?: boolean;
 }
 
 interface AuthContextType {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { userStore } from '@/lib/user-store';
+import { prisma } from '@/lib/prisma';
 import { createToken, setAuthCookie } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -15,7 +15,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if user exists
-        const existingUser = userStore.findByEmail(email);
+        const existingUser = await prisma.user.findUnique({
+            where: { email }
+        });
 
         if (existingUser) {
             return NextResponse.json(
@@ -28,10 +30,12 @@ export async function POST(request: NextRequest) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create user
-        const user = userStore.create({
-            email,
-            password: hashedPassword,
-            name,
+        const user = await prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                name,
+            }
         });
 
         // Create token and set cookie
@@ -50,6 +54,7 @@ export async function POST(request: NextRequest) {
                 profilePicture: user.profilePicture,
                 description: user.description,
                 createdAt: user.createdAt,
+                hasShop: false,
             },
         });
     } catch (error) {

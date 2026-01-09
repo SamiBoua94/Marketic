@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { userStore } from '@/lib/user-store';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
@@ -10,11 +10,18 @@ export async function GET() {
             return NextResponse.json({ user: null });
         }
 
-        const user = userStore.findById(session.id);
+        const user = await prisma.user.findUnique({
+            where: { id: session.id }
+        });
 
         if (!user) {
             return NextResponse.json({ user: null });
         }
+
+        const shop = await prisma.shop.findUnique({
+            where: { userId: session.id },
+            select: { id: true }
+        });
 
         return NextResponse.json({
             user: {
@@ -24,6 +31,7 @@ export async function GET() {
                 profilePicture: user.profilePicture,
                 description: user.description,
                 createdAt: user.createdAt,
+                hasShop: !!shop,
             },
         });
     } catch (error) {
