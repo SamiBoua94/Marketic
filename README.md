@@ -1,3 +1,4 @@
+V1.1 par Morazi validé par SamSam le 09/01
 V1.0 par TikiWikim validé par SamSam le 08/01
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
