@@ -9,7 +9,17 @@ import { useState, useRef, useEffect } from 'react';
 export function Header() {
     const { user, loading, logout } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Communicate search query to the window for simple page integration
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const event = new CustomEvent('app-search', { detail: searchQuery });
+            window.dispatchEvent(event);
+        }
+    }, [searchQuery]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -51,10 +61,25 @@ export function Header() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
-                        <Search className="w-5 h-5" />
-                        <span className="sr-only">Rechercher</span>
-                    </Button>
+                    <div className={`relative flex items-center transition-all duration-300 ease-in-out ${isSearchOpen ? 'w-48 sm:w-64' : 'w-10'}`}>
+                        <button
+                            onClick={() => {
+                                if (isSearchOpen) setSearchQuery('');
+                                setIsSearchOpen(!isSearchOpen);
+                            }}
+                            className={`p-2 rounded-full hover:bg-secondary/10 transition-colors z-10 ${isSearchOpen ? 'text-primary' : 'text-foreground/70'}`}
+                        >
+                            <Search className="w-5 h-5" />
+                            <span className="sr-only">Rechercher</span>
+                        </button>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Rechercher un produit..."
+                            className={`absolute left-0 pl-10 pr-4 py-2 w-full bg-secondary/5 border border-secondary/20 rounded-full text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${isSearchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+                        />
+                    </div>
 
                     <Link href="/cart">
                         <Button variant="ghost" size="sm" className="relative">
