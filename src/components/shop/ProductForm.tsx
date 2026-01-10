@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Camera, Save, X, Trash } from 'lucide-react';
+import { Camera, Save, X, Trash, Plus, Tag, Info, Upload, Award } from 'lucide-react';
 
 interface ProductData {
     id?: string;
@@ -11,7 +11,19 @@ interface ProductData {
     price: string;
     stock: string;
     images?: string[];
-    category?: string;
+    tags?: string[];
+    productInfo?: ProductInfo;
+}
+
+interface ProductInfo {
+    materials: string;
+    materialSources: string;
+    purchaseLocation: string;
+    handmadeOrPurchased: string;
+    supplyChainSteps: string;
+    traceabilityDocuments: string;
+    proofs?: string[];
+    ethicalScore?: number;
 }
 
 interface ProductFormProps {
@@ -30,34 +42,79 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                 price: '',
                 stock: '',
                 images: [],
-                category: ''
+                tags: [],
+                productInfo: {
+                    materials: '',
+                    materialSources: '',
+                    purchaseLocation: '',
+                    handmadeOrPurchased: '',
+                    supplyChainSteps: '',
+                    traceabilityDocuments: '',
+                    proofs: []
+                }
             };
         }
 
-        // Handle images parsing if string (DB format)
+        // Parse existing fields if they are strings
         let processedImages: string[] = [];
         if (typeof initialData.images === 'string') {
-            try {
-                processedImages = JSON.parse(initialData.images);
-            } catch (e) {
-                console.error("Failed to parse images", e);
-                processedImages = [];
-            }
+            try { processedImages = JSON.parse(initialData.images); } catch (e) { processedImages = []; }
         } else if (Array.isArray(initialData.images)) {
             processedImages = initialData.images;
+        }
+
+        let processedTags: string[] = [];
+        if (typeof initialData.tags === 'string') {
+            try { processedTags = JSON.parse(initialData.tags); } catch (e) { processedTags = []; }
+        } else if (Array.isArray(initialData.tags)) {
+            processedTags = initialData.tags;
+        }
+
+        let processedInfo: ProductInfo = {
+            materials: '',
+            materialSources: '',
+            purchaseLocation: '',
+            handmadeOrPurchased: '',
+            supplyChainSteps: '',
+            traceabilityDocuments: '',
+            proofs: [],
+            ethicalScore: 0
+        };
+        if (typeof initialData.productInfo === 'string') {
+            try { processedInfo = JSON.parse(initialData.productInfo); } catch (e) { }
+        } else if (initialData.productInfo) {
+            processedInfo = initialData.productInfo;
         }
 
         return {
             ...initialData,
             price: String(initialData.price),
             stock: String(initialData.stock),
-            images: processedImages
+            images: processedImages,
+            tags: processedTags,
+            productInfo: processedInfo
         };
     });
 
+    const [showProductInfo, setShowProductInfo] = useState(false);
+    const [newTag, setNewTag] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const proofInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const calculateScore = (info: ProductInfo) => {
+        let filledCount = 0;
+        if (info.materials?.trim()) filledCount++;
+        if (info.materialSources?.trim()) filledCount++;
+        if (info.purchaseLocation?.trim()) filledCount++;
+        if (info.handmadeOrPurchased?.trim()) filledCount++;
+        if (info.supplyChainSteps?.trim()) filledCount++;
+        if (info.traceabilityDocuments?.trim()) filledCount++;
+        if (info.proofs && info.proofs.length > 0) filledCount++;
+
+        return Math.round((filledCount / 7) * 100);
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isProof: boolean = false) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -74,14 +131,30 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             if (!res.ok) throw new Error('Upload failed');
 
             const resData = await res.json();
-            // Append new image to the list
-            setData(prev => ({
-                ...prev,
-                images: [...(prev.images || []), resData.url]
-            }));
+
+            if (isProof) {
+                setData(prev => {
+                    const newInfo = {
+                        ...prev.productInfo!,
+                        proofs: [...(prev.productInfo?.proofs || []), resData.url]
+                    };
+                    return {
+                        ...prev,
+                        productInfo: {
+                            ...newInfo,
+                            ethicalScore: calculateScore(newInfo)
+                        }
+                    };
+                });
+            } else {
+                setData(prev => ({
+                    ...prev,
+                    images: [...(prev.images || []), resData.url]
+                }));
+            }
         } catch (error) {
-            console.error('Error uploading image:', error);
-            alert('Erreur lors du téléchargement de l\'image');
+            console.error('Error uploading file:', error);
+            alert('Erreur lors du téléchargement');
         } finally {
             setLoading(false);
         }
@@ -92,6 +165,58 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             ...prev,
             images: prev.images?.filter((_, index) => index !== indexToRemove)
         }));
+    };
+
+    const removeProof = (indexToRemove: number) => {
+        setData(prev => {
+            const newInfo = {
+                ...prev.productInfo!,
+                proofs: prev.productInfo?.proofs?.filter((_, index) => index !== indexToRemove) || []
+            };
+            return {
+                ...prev,
+                productInfo: {
+                    ...newInfo,
+                    ethicalScore: calculateScore(newInfo)
+                }
+            };
+        });
+    };
+
+    const addTag = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && newTag.trim()) {
+            e.preventDefault();
+            if (!data.tags?.includes(newTag.trim())) {
+                setData(prev => ({
+                    ...prev,
+                    tags: [...(prev.tags || []), newTag.trim()]
+                }));
+            }
+            setNewTag('');
+        }
+    };
+
+    const removeTag = (tagToRemove: string) => {
+        setData(prev => ({
+            ...prev,
+            tags: prev.tags?.filter(t => t !== tagToRemove)
+        }));
+    };
+
+    const handleInfoChange = (field: keyof ProductInfo, value: string) => {
+        setData(prev => {
+            const newInfo = {
+                ...prev.productInfo!,
+                [field]: value
+            };
+            return {
+                ...prev,
+                productInfo: {
+                    ...newInfo,
+                    ethicalScore: calculateScore(newInfo)
+                }
+            };
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -122,7 +247,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-6">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
                     {initialData ? 'Modifier l\'article' : 'Ajouter un article'}
@@ -135,7 +260,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             <div className="space-y-6">
                 {/* Images Section */}
                 <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Photos</label>
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Photos du produit</label>
                     <div className="flex flex-wrap gap-4">
                         {data.images?.map((img, index) => (
                             <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 group">
@@ -152,7 +277,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-24 h-24 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center text-zinc-400 hover:border-blue-500 hover:text-blue-500 transition-colors"
+                            className="w-24 h-24 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center text-zinc-400 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
                         >
                             <Camera size={24} />
                             <span className="text-xs mt-1">Ajouter</span>
@@ -160,7 +285,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                         <input
                             type="file"
                             ref={fileInputRef}
-                            onChange={handleFileUpload}
+                            onChange={(e) => handleFileUpload(e, false)}
                             className="hidden"
                             accept="image/*"
                         />
@@ -174,7 +299,8 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                         type="text"
                         value={data.name}
                         onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
+                        placeholder="Ex: Vase en céramique bleue"
                         required
                     />
                 </div>
@@ -188,7 +314,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                             step="0.01"
                             value={data.price}
                             onChange={(e) => setData(prev => ({ ...prev, price: e.target.value }))}
-                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
                             required
                         />
                     </div>
@@ -198,28 +324,36 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                             type="number"
                             value={data.stock}
                             onChange={(e) => setData(prev => ({ ...prev, stock: e.target.value }))}
-                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
                             required
                         />
                     </div>
                 </div>
 
-                {/* Category */}
+                {/* Tags (Replacement for Category) */}
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Catégorie</label>
-                    <select
-                        value={data.category || ''}
-                        onChange={(e) => setData(prev => ({ ...prev, category: e.target.value }))}
-                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
-                        <option value="">Sélectionner une catégorie</option>
-                        <option value="ceramique">Céramique</option>
-                        <option value="textile">Textile</option>
-                        <option value="menuiserie">Menuiserie</option>
-                        <option value="bijoux">Bijoux</option>
-                        <option value="decoration">Décoration</option>
-                        <option value="autre">Autre</option>
-                    </select>
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags</label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                        {data.tags?.map((tag, index) => (
+                            <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-sm">
+                                {tag}
+                                <button type="button" onClick={() => removeTag(tag)} className="hover:text-emerald-900 dark:hover:text-emerald-200">
+                                    <X size={14} />
+                                </button>
+                            </span>
+                        ))}
+                    </div>
+                    <div className="relative">
+                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                        <input
+                            type="text"
+                            value={newTag}
+                            onChange={(e) => setNewTag(e.target.value)}
+                            onKeyDown={addTag}
+                            placeholder="Ajouter un tag (Entrée)"
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
+                        />
+                    </div>
                 </div>
 
                 {/* Description */}
@@ -228,9 +362,136 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     <textarea
                         value={data.description}
                         onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none min-h-[100px]"
+                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none min-h-[100px]"
+                        placeholder="Décrivez votre produit..."
                         required
                     />
+                </div>
+
+                {/* Product Info Section Toggle */}
+                <div className="border-t border-zinc-200 dark:border-zinc-800 pt-6">
+                    <button
+                        type="button"
+                        onClick={() => setShowProductInfo(!showProductInfo)}
+                        className="w-full flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                        <div className="flex items-center gap-3">
+                            <Info className="text-emerald-600" size={24} />
+                            <div className="text-left">
+                                <span className="font-semibold block">Informations produit</span>
+                                <span className="text-xs text-zinc-500">Transparence et traçabilité pour vos clients</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            {data.productInfo?.ethicalScore !== undefined && (
+                                <div className="flex items-center gap-1 px-3 py-1 bg-emerald-500 text-white rounded-full text-xs font-bold">
+                                    <Award size={14} />
+                                    Score: {data.productInfo.ethicalScore}%
+                                </div>
+                            )}
+                            <Plus className={`transition-transform ${showProductInfo ? 'rotate-45' : ''}`} />
+                        </div>
+                    </button>
+
+                    {showProductInfo && (
+                        <div className="mt-4 space-y-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Matières</label>
+                                <input
+                                    type="text"
+                                    value={data.productInfo?.materials}
+                                    onChange={(e) => handleInfoChange('materials', e.target.value)}
+                                    placeholder="Ex: Coton bio, Bois flotté..."
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Source des matériaux</label>
+                                <input
+                                    type="text"
+                                    value={data.productInfo?.materialSources}
+                                    onChange={(e) => handleInfoChange('materialSources', e.target.value)}
+                                    placeholder="Ex: Fournisseur local, Recyclage..."
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Où avez-vous acheté le produit de base ?</label>
+                                <input
+                                    type="text"
+                                    value={data.productInfo?.purchaseLocation}
+                                    onChange={(e) => handleInfoChange('purchaseLocation', e.target.value)}
+                                    placeholder="Ex: Mercerie du coin, Site spécialisé..."
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Fait main ou acheté tels quels ?</label>
+                                <select
+                                    value={data.productInfo?.handmadeOrPurchased}
+                                    onChange={(e) => handleInfoChange('handmadeOrPurchased', e.target.value)}
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                >
+                                    <option value="">Sélectionner</option>
+                                    <option value="handmade">Fait main de A à Z</option>
+                                    <option value="customized">Acheté et personnalisé</option>
+                                    <option value="resale">Revendu tel quel</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Pouvez-vous décrire les principales étapes de la chaîne d'approvisionnement de ce produit ?</label>
+                                <textarea
+                                    value={data.productInfo?.supplyChainSteps}
+                                    onChange={(e) => handleInfoChange('supplyChainSteps', e.target.value)}
+                                    placeholder="Décrivez les étapes de fabrication et de transport..."
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Sur quels documents (certificats, factures, bordereaux) vous appuyez-vous pour garantir la traçabilité ?</label>
+                                <textarea
+                                    value={data.productInfo?.traceabilityDocuments}
+                                    onChange={(e) => handleInfoChange('traceabilityDocuments', e.target.value)}
+                                    placeholder="Ex: Factures fournisseurs, Certificats d'origine..."
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium block">Preuves du produit (Photos, factures...)</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {data.productInfo?.proofs?.map((proof, index) => (
+                                        <div key={index} className="relative w-16 h-16 rounded border dark:border-zinc-700 group">
+                                            <img src={proof} className="w-full h-full object-cover rounded" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeProof(index)}
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X size={10} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => proofInputRef.current?.click()}
+                                        className="w-16 h-16 rounded border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center text-zinc-400 hover:border-emerald-500 hover:text-emerald-500"
+                                    >
+                                        <Upload size={16} />
+                                        <span className="text-[10px] mt-1">Preuve</span>
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={proofInputRef}
+                                        onChange={(e) => handleFileUpload(e, true)}
+                                        className="hidden"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
@@ -244,7 +505,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center gap-2 disabled:opacity-50"
                     >
                         {loading ? 'Enregistrement...' : (
                             <>
@@ -258,3 +519,4 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
         </form>
     );
 }
+

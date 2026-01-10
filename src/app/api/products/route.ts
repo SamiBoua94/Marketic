@@ -54,7 +54,9 @@ export async function POST(request: NextRequest) {
                 description: data.description,
                 price: parseFloat(data.price),
                 stock: parseInt(data.stock || '0', 10),
-                images: data.images ? JSON.stringify(data.images) : null, // Store as JSON string or handle appropriately
+                images: data.images ? JSON.stringify(data.images) : null,
+                tags: data.tags ? JSON.stringify(data.tags) : null,
+                productInfo: data.productInfo ? JSON.stringify(data.productInfo) : null,
                 category: data.category,
                 shopId: shop.id
             }

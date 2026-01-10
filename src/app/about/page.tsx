@@ -6,7 +6,7 @@ import Link from 'next/link';
 export default function About() {
     return (
         <>
-            <Header />
+            
             <main className="min-h-screen bg-gradient-to-b from-background to-secondary/5">
                 {/* Hero Section */}
                 <section className="container mx-auto px-4 py-20">

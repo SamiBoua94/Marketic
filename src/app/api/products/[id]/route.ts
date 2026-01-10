@@ -32,6 +32,8 @@ export async function PUT(
                 price: parseFloat(data.price),
                 stock: parseInt(data.stock, 10),
                 images: data.images ? JSON.stringify(data.images) : undefined,
+                tags: data.tags ? JSON.stringify(data.tags) : undefined,
+                productInfo: data.productInfo ? JSON.stringify(data.productInfo) : undefined,
                 category: data.category,
             }
         });

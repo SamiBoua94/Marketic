@@ -47,6 +47,8 @@ model Product {
   price       Float
   stock       Int
   images      String?  // JSON string or comma separated
+  tags        String?  // JSON string
+  productInfo String?  // JSON string containing materials, sources, etc.
   category    String?
   shopId      String
   shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)

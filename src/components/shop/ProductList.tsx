@@ -11,6 +11,8 @@ interface Product {
     price: number;
     stock: number;
     images: string | null;
+    tags: string | null;
+    productInfo: string | null;
     category: string | null;
 }
 
@@ -43,6 +45,21 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                     images = [];
                 }
                 const mainImage = images.length > 0 ? images[0] : null;
+
+                let tags: string[] = [];
+                try {
+                    tags = product.tags ? JSON.parse(product.tags as string) : [];
+                } catch {
+                    tags = [];
+                }
+
+                let score = 0;
+                try {
+                    const info = product.productInfo ? JSON.parse(product.productInfo as string) : null;
+                    score = info?.ethicalScore || 0;
+                } catch {
+                    score = 0;
+                }
 
                 return (
                     <div key={product.id} className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden group hover:shadow-md transition-shadow">
@@ -84,13 +101,28 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                         {/* Content */}
                         <div className="p-4">
                             <div className="flex justify-between items-start mb-2">
-                                <div>
-                                    <span className="text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full mb-2 inline-block">
-                                        {product.category || 'Non classé'}
-                                    </span>
+                                <div className="flex-1">
+                                    <div className="flex flex-wrap gap-1 mb-2">
+                                        {tags.length > 0 ? tags.map((tag: string, i: number) => (
+                                            <span key={i} className="text-[10px] font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
+                                                {tag}
+                                            </span>
+                                        )) : (
+                                            <span className="text-[10px] font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+                                                Sans tag
+                                            </span>
+                                        )}
+                                    </div>
                                     <h3 className="font-semibold text-zinc-900 dark:text-white line-clamp-1">{product.name}</h3>
                                 </div>
-                                <span className="font-bold text-zinc-900 dark:text-white">{product.price.toFixed(2)} €</span>
+                                <div className="text-right">
+                                    <span className="font-bold text-zinc-900 dark:text-white">{product.price.toFixed(2)} €</span>
+                                    {score > 0 && (
+                                        <div className="text-[10px] font-bold text-emerald-600 flex items-center justify-end gap-1 mt-1">
+                                            Score: {score}%
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-4 h-10">
                                 {product.description}
