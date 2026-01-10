@@ -45,7 +45,7 @@ export function Header() {
                         Notre Mission
                     </Link>
                     <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
-                        Demandez à l'IA
+                        Demander à l'IA
                     </Link>
                 </nav>
 
