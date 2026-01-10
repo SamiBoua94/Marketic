@@ -41,14 +41,11 @@ export function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/artisans" className="text-sm font-medium hover:text-primary transition-colors">
-                        Pour les Artisans
-                    </Link>
-                    <Link href="/catalogue" className="text-sm font-medium hover:text-primary transition-colors">
-                        Catalogue
-                    </Link>
                     <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
                         Notre Mission
+                    </Link>
+                    <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
+                        Demandez à l'IA
                     </Link>
                 </nav>
 
