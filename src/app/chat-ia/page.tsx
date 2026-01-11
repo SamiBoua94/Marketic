@@ -21,7 +21,7 @@ export default function ChatIAPage() {
   const messages: Message[] = [
     {
       id: 'welcome',
-      content: isGeminiAvailable 
+      content: isGeminiAvailable
         ? 'Bonjour ! Je suis votre assistant IA Markethic, alimenté par Google Gemini. Je suis là pour vous aider à découvrir nos artisans locaux, vous conseiller sur les produits artisanaux, ou répondre à toutes vos questions sur notre plateforme. Comment puis-je vous aider aujourd\'hui ?'
         : 'Bonjour ! Je suis votre assistant IA pour Markethic. Je fonctionne actuellement en mode démo. Je suis là pour vous aider à découvrir nos artisans locaux et vous conseiller sur les produits artisanaux. Comment puis-je vous aider aujourd\'hui ?',
       role: 'assistant',
@@ -45,7 +45,7 @@ export default function ChatIAPage() {
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
-    
+
     await sendMessage(inputValue.trim());
     setInputValue('');
   };
@@ -66,28 +66,27 @@ export default function ChatIAPage() {
             <div className="p-3 bg-primary/10 rounded-full">
               <Sparkles className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Assistant IA Markethic</h1>
+            <h1 className="text-3xl font-bold text-foreground"> Green AI Markethic</h1>
           </div>
           <p className="text-foreground/70 max-w-2xl mx-auto">
-            Discutez avec notre intelligence artificielle pour découvrir les artisans locaux, 
+            Discutez avec notre intelligence artificielle pour découvrir les artisans locaux,
             obtenir des recommandations personnalisées et en savoir plus sur nos produits artisanaux.
           </p>
-          
+
           {/* Status Banner */}
-          <div className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${
-            isGeminiAvailable 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-yellow-100 text-yellow-800'
-          }`}>
+          <div className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${isGeminiAvailable
+            ? 'bg-green-100 text-green-800'
+            : 'bg-yellow-100 text-yellow-800'
+            }`}>
             {isGeminiAvailable ? (
               <>
                 <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse" />
-                <span>Alimenté par Google Gemini ✨</span>
+                <span>Alimenté par un Gemini ✨</span>
               </>
             ) : (
               <>
                 <AlertCircle className="w-4 h-4" />
-                <span>Mode démo - Configurez votre clé API Gemini</span>
+                <span>Mode démo - Configurez votre clé API "Small Language Model" de préférence</span>
               </>
             )}
           </div>
@@ -107,13 +106,12 @@ export default function ChatIAPage() {
                     <Bot className="w-5 h-5 text-primary" />
                   </div>
                 )}
-                
+
                 <div
-                  className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary/10 text-foreground'
-                  }`}
+                  className={`max-w-[70%] rounded-2xl px-4 py-3 ${message.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary/10 text-foreground'
+                    }`}
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
                   <p className="text-xs opacity-60 mt-1">
@@ -131,7 +129,7 @@ export default function ChatIAPage() {
                 )}
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex gap-3 justify-start">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -177,7 +175,7 @@ export default function ChatIAPage() {
         {/* Info Section */}
         <div className="mt-8 text-center">
           <p className="text-sm text-foreground/60">
-            💡 <strong>Astuce :</strong> Posez-moi des questions sur les artisans, les produits, 
+            💡 <strong>Astuce :</strong> Posez-moi des questions sur les artisans, les produits,
             les techniques artisanales ou comment commander sur Markethic.
           </p>
         </div>
