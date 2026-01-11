@@ -54,6 +54,9 @@ export function Header() {
                     <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
                         Notre Mission
                     </Link>
+                    <Link href="/services" className="text-sm font-medium hover:text-primary transition-colors">
+                        Services
+                    </Link>
                     <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
                         Demander à l'IA
                     </Link>
