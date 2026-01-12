@@ -22,7 +22,7 @@ export default function About() {
                             Notre Mission
                         </h1>
                         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                            Redonner le pouvoir d'achat aux commerçants, artistes et artisans de notre territoire
+                            Redonner le pouvoir d'achat aux commerçants, artistes et artisans de nos régions
                             face aux géants du e-commerce.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -86,17 +86,16 @@ export default function About() {
                                     <div className="p-2 bg-green-100 rounded-lg">
                                         <Leaf className="w-6 h-6 text-green-600" />
                                     </div>
-                                    <h3 className="text-xl font-semibold">Score Éthique</h3>
+                                    <h3 className="text-xl font-semibold">Marketing Éthique</h3>
                                 </div>
                                 <p className="text-muted-foreground mb-4">
-                                    Un système de notation transparent qui évalue chaque produit selon des critères éthiques,
-                                    environnementaux et locaux. Plus de secret, plus de dropshipping masqué.
+                                    Nous résolvons les problèmes rencontrés sur les marketplaces traditionnelles, en étant les moins cher sur le marché.
                                 </p>
                                 <ul className="space-y-2 text-sm text-muted-foreground">
-                                    <li>• Origine des produits</li>
-                                    <li>• Impact environnemental</li>
-                                    <li>• Circuit court ou long</li>
-                                    <li>• Production éthique</li>
+                                    <li>• Gestion e-commerce simplifiée </li>
+                                    <li>• Création de boutique en ligne facile et gratuite</li>
+                                    <li>• Outils pour développer votre business </li>
+                                    <li>• Garantie de qualité des produits</li>
                                 </ul>
                             </div>
                             <div className="text-left p-6 bg-white rounded-xl border border-secondary/20">
@@ -108,13 +107,12 @@ export default function About() {
                                 </div>
                                 <p className="text-muted-foreground mb-4">
                                     Notre intelligence artificielle vous aide à trouver les produits qui correspondent vraiment
-                                    à vos valeurs et à vos besoins locaux.
+                                    à vos valeurs et à vos besoins.
                                 </p>
                                 <ul className="space-y-2 text-sm text-muted-foreground">
                                     <li>• Recommandations personnalisées</li>
-                                    <li>• Analyse des besoins locaux</li>
-                                    <li>• Mise en relation consommateur-producteur</li>
-                                    <li>• Suggestions d'achats utiles</li>
+                                    <li>• Facilite la mise en relation consommateur-producteur</li>
+                                    <li>• Prévention sur les boycotts en cours</li>
                                 </ul>
                             </div>
                         </div>
@@ -287,7 +285,7 @@ export default function About() {
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-3 items-center">
                                         <code className="bg-black/40 px-4 py-2 rounded-lg text-primary font-mono text-sm border border-primary/30 flex-1 text-center sm:text-left">
-                                            markethic-secure.onion
+                                            http://4tz3l4knxzbcmljptaj57tnk3ru2t2pp3utb7ebs7uwwwzcqacisdtyd.onion
                                         </code>
                                         <Button
                                             variant="outline"

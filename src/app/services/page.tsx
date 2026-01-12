@@ -12,7 +12,8 @@ import {
     Briefcase,
     FileText,
     Lock,
-    ArrowRight
+    ArrowRight,
+    ScanBarcode
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -41,7 +42,7 @@ export default function ServicesPage() {
                         <h2 className="text-3xl font-bold">Nos Services</h2>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Trustation */}
                         <div className="group relative bg-white rounded-3xl p-8 border border-secondary/20 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110" />
@@ -77,6 +78,28 @@ export default function ServicesPage() {
                                 </div>
                                 <p className="text-muted-foreground mb-8">
                                     Une solution logistique intégrée pour expédier vos produits partout en France en un clic.
+                                </p>
+                                <Button disabled variant="outline" className="w-full py-6 text-lg border-dashed">
+                                    <Lock className="w-4 h-4 mr-2" />
+                                    Bientôt disponible
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Scored */}
+                        <div className="group relative bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-secondary/20 shadow-sm transition-all duration-300">
+                            <div className="relative">
+                                <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
+                                    <ScanBarcode className="w-8 h-8 text-emerald-600" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <h3 className="text-2xl font-bold">Scored</h3>
+                                    <span className="px-3 py-1 bg-secondary/20 text-secondary text-xs font-bold rounded-full uppercase tracking-wider">
+                                        Prochainement
+                                    </span>
+                                </div>
+                                <p className="text-muted-foreground mb-8">
+                                    Notre partenaire Scored vous permet de voir les spécifications des produits. C'est le Yuka des objets.
                                 </p>
                                 <Button disabled variant="outline" className="w-full py-6 text-lg border-dashed">
                                     <Lock className="w-4 h-4 mr-2" />
