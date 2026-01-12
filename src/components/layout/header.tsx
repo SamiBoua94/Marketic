@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { useState, useRef, useEffect } from 'react';
@@ -121,14 +121,6 @@ export function Header() {
                                         <p className="text-sm text-foreground/60">{user.email}</p>
                                     </div>
                                     <Link
-                                        href="/shop"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                    >
-                                        <Store className="w-4 h-4" />
-                                        {user.hasShop ? "Gérer ma boutique" : "Ouvrir ma boutique"}
-                                    </Link>
-                                    <Link
                                         href="/profile"
                                         onClick={() => setDropdownOpen(false)}
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
@@ -136,6 +128,34 @@ export function Header() {
                                         <User className="w-4 h-4" />
                                         Mon Profil
                                     </Link>
+                                    <Link
+                                        href="/shop"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                    >
+                                        <Store className="w-4 h-4" />
+                                        {user.hasShop ? "Gérer ma boutique" : "Ouvrir ma boutique"}
+                                    </Link>
+                                    {user.hasShop && (
+                                        <>
+                                            <Link
+                                                href="/orders"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                            >
+                                                <Package className="w-4 h-4" />
+                                                Commande
+                                            </Link>
+                                            <Link
+                                                href="/support"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                            >
+                                                <Headphones className="w-4 h-4" />
+                                                Support
+                                            </Link>
+                                        </>
+                                    )}
                                     <button
                                         onClick={handleLogout}
                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"

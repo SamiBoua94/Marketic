@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { User, Camera, Calendar, FileText, Loader2, Check, Upload } from "lucide-react";
+import { User, Camera, Calendar, FileText, Loader2, Check, Upload, Package, Headphones, LogOut, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 
@@ -242,8 +242,9 @@ export default function ProfilePage() {
                                 <Button onClick={() => setEditing(true)} className="flex-1">
                                     Modifier mon profil
                                 </Button>
-                                <Button variant="outline" onClick={handleLogout} className="flex-1">
-                                    Se déconnecter
+                                <Button variant="outline" onClick={() => router.push('/')} className="flex-1 gap-2">
+                                    <Home className="w-4 h-4" />
+                                    Retour au menu principal
                                 </Button>
                             </>
                         )}
