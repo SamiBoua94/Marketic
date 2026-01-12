@@ -34,6 +34,7 @@ export async function PUT(
                 images: data.images ? JSON.stringify(data.images) : undefined,
                 tags: data.tags ? JSON.stringify(data.tags) : undefined,
                 productInfo: data.productInfo ? JSON.stringify(data.productInfo) : undefined,
+                options: data.options ? JSON.stringify(data.options) : undefined,
                 category: data.category,
             }
         });

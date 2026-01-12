@@ -9,6 +9,9 @@ interface ShopData {
     name: string;
     description: string;
     address: string;
+    city?: string;
+    postalCode?: string;
+    legalStatus?: string;
     email: string;
     phone: string;
     profilePicture: string | null;
@@ -18,6 +21,9 @@ interface ShopData {
     instagram?: string;
     facebook?: string;
     twitter?: string;
+    tiktok?: string;
+    youtube?: string;
+    tags?: string[];
 }
 
 interface ShopFormProps {
@@ -35,20 +41,37 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
     // If initialData (viewing), force View Mode (isEditMode = false).
     const [isEditMode, setIsEditMode] = useState(!initialData);
 
-    const [data, setData] = useState<ShopData>(initialData || {
-        name: '',
-        description: '',
-        address: '',
-        email: '',
-        phone: '',
-        profilePicture: null,
-        bannerPicture: null,
-        bannerPicture: null,
-        certificationPicture: null,
-        siret: '',
-        instagram: '',
-        facebook: '',
-        twitter: ''
+    const [data, setData] = useState<ShopData>(() => {
+        if (initialData) {
+            // Parse tags if it's a string
+            let parsedTags: string[] = [];
+            if (typeof (initialData as any).tags === 'string') {
+                try { parsedTags = JSON.parse((initialData as any).tags); } catch { parsedTags = []; }
+            } else if (Array.isArray(initialData.tags)) {
+                parsedTags = initialData.tags;
+            }
+            return { ...initialData, tags: parsedTags };
+        }
+        return {
+            name: '',
+            description: '',
+            address: '',
+            city: '',
+            postalCode: '',
+            legalStatus: '',
+            email: '',
+            phone: '',
+            profilePicture: null,
+            bannerPicture: null,
+            certificationPicture: null,
+            siret: '',
+            instagram: '',
+            facebook: '',
+            twitter: '',
+            tiktok: '',
+            youtube: '',
+            tags: []
+        };
     });
 
     const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -284,6 +307,62 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                 )}
                             </div>
                         </div>
+
+                        {/* City Input */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Ville</label>
+                            {isEditMode ? (
+                                <input
+                                    type="text"
+                                    value={data.city || ''}
+                                    onChange={(e) => setData(prev => ({ ...prev, city: e.target.value }))}
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    placeholder="Paris"
+                                />
+                            ) : (
+                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.city || '-'}</p>
+                            )}
+                        </div>
+
+                        {/* Postal Code Input */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Code postal</label>
+                            {isEditMode ? (
+                                <input
+                                    type="text"
+                                    value={data.postalCode || ''}
+                                    onChange={(e) => setData(prev => ({ ...prev, postalCode: e.target.value }))}
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    placeholder="75001"
+                                />
+                            ) : (
+                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.postalCode || '-'}</p>
+                            )}
+                        </div>
+
+                        {/* Legal Status Input */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Statut légal du commerçant</label>
+                            {isEditMode ? (
+                                <select
+                                    value={data.legalStatus || ''}
+                                    onChange={(e) => setData(prev => ({ ...prev, legalStatus: e.target.value }))}
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                >
+                                    <option value="">Sélectionner</option>
+                                    <option value="auto-entrepreneur">Auto-entrepreneur</option>
+                                    <option value="eurl">EURL</option>
+                                    <option value="sarl">SARL</option>
+                                    <option value="sas">SAS</option>
+                                    <option value="sasu">SASU</option>
+                                    <option value="ei">Entreprise Individuelle</option>
+                                    <option value="association">Association</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            ) : (
+                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.legalStatus || '-'}</p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Description */}
@@ -372,7 +451,75 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                     <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.twitter || '-'}</p>
                                 )}
                             </div>
+
+                            {/* TikTok */}
+                            <div className="flex items-center gap-2">
+                                <span className="w-24 text-sm text-zinc-500">TikTok</span>
+                                {isEditMode ? (
+                                    <input
+                                        type="text"
+                                        value={data.tiktok || ''}
+                                        onChange={(e) => setData(prev => ({ ...prev, tiktok: e.target.value }))}
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="@mon_tiktok"
+                                    />
+                                ) : (
+                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.tiktok || '-'}</p>
+                                )}
+                            </div>
+
+                            {/* YouTube */}
+                            <div className="flex items-center gap-2">
+                                <span className="w-24 text-sm text-zinc-500">YouTube</span>
+                                {isEditMode ? (
+                                    <input
+                                        type="text"
+                                        value={data.youtube || ''}
+                                        onChange={(e) => setData(prev => ({ ...prev, youtube: e.target.value }))}
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="youtube.com/@machaîne"
+                                    />
+                                ) : (
+                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.youtube || '-'}</p>
+                                )}
+                            </div>
                         </div>
+                    </div>
+
+                    {/* Shop Tags Section */}
+                    <div className="mt-6">
+                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Choisir mes Tags</label>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {data.tags?.map((tag, index) => (
+                                <span key={index} className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium">
+                                    {tag}
+                                    {isEditMode && (
+                                        <button type="button" onClick={() => setData(prev => ({ ...prev, tags: prev.tags?.filter((_, i) => i !== index) }))} className="hover:text-blue-900 dark:hover:text-blue-200 ml-1">
+                                            ×
+                                        </button>
+                                    )}
+                                </span>
+                            ))}
+                        </div>
+                        {isEditMode && (
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Ajouter un tag (ex: Bio, Local, Artisanat...)"
+                                    className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const value = (e.target as HTMLInputElement).value.trim();
+                                            if (value && !data.tags?.includes(value)) {
+                                                setData(prev => ({ ...prev, tags: [...(prev.tags || []), value] }));
+                                                (e.target as HTMLInputElement).value = '';
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {/* Certification Section */}

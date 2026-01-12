@@ -4,6 +4,11 @@
 import { useState, useRef } from 'react';
 import { Camera, Save, X, Trash, Plus, Tag, Info, Upload, Award } from 'lucide-react';
 
+interface ProductOption {
+    name: string;
+    values: string[];
+}
+
 interface ProductData {
     id?: string;
     name: string;
@@ -12,6 +17,7 @@ interface ProductData {
     stock: string;
     images?: string[];
     tags?: string[];
+    options?: ProductOption[];
     productInfo?: ProductInfo;
 }
 
@@ -22,6 +28,8 @@ interface ProductInfo {
     handmadeOrPurchased: string;
     supplyChainSteps: string;
     traceabilityDocuments: string;
+    materialsList?: string[];
+    additionalInfo?: string;
     proofs?: string[];
     ethicalScore?: number;
 }
@@ -43,6 +51,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                 stock: '',
                 images: [],
                 tags: [],
+                options: [],
                 productInfo: {
                     materials: '',
                     materialSources: '',
@@ -50,6 +59,8 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     handmadeOrPurchased: '',
                     supplyChainSteps: '',
                     traceabilityDocuments: '',
+                    materialsList: [],
+                    additionalInfo: '',
                     proofs: []
                 }
             };
@@ -356,6 +367,75 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     </div>
                 </div>
 
+                {/* Options Section */}
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Options (couleur, taille, etc.)</label>
+                    <div className="space-y-3">
+                        {data.options?.map((option, optIndex) => (
+                            <div key={optIndex} className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <input
+                                        type="text"
+                                        value={option.name}
+                                        onChange={(e) => {
+                                            const newOptions = [...(data.options || [])];
+                                            newOptions[optIndex] = { ...option, name: e.target.value };
+                                            setData(prev => ({ ...prev, options: newOptions }));
+                                        }}
+                                        placeholder="Nom de l'option (ex: Couleur)"
+                                        className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setData(prev => ({ ...prev, options: prev.options?.filter((_, i) => i !== optIndex) }))}
+                                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                    >
+                                        <Trash size={14} />
+                                    </button>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {option.values.map((val, valIndex) => (
+                                        <span key={valIndex} className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-200 dark:bg-zinc-700 rounded text-xs">
+                                            {val}
+                                            <button type="button" onClick={() => {
+                                                const newOptions = [...(data.options || [])];
+                                                newOptions[optIndex] = { ...option, values: option.values.filter((_, vi) => vi !== valIndex) };
+                                                setData(prev => ({ ...prev, options: newOptions }));
+                                            }}>
+                                                <X size={10} />
+                                            </button>
+                                        </span>
+                                    ))}
+                                    <input
+                                        type="text"
+                                        placeholder="+ valeur"
+                                        className="px-2 py-1 text-xs border border-dashed border-zinc-300 dark:border-zinc-600 rounded bg-transparent outline-none w-20"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const value = (e.target as HTMLInputElement).value.trim();
+                                                if (value) {
+                                                    const newOptions = [...(data.options || [])];
+                                                    newOptions[optIndex] = { ...option, values: [...option.values, value] };
+                                                    setData(prev => ({ ...prev, options: newOptions }));
+                                                    (e.target as HTMLInputElement).value = '';
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setData(prev => ({ ...prev, options: [...(prev.options || []), { name: '', values: [] }] }))}
+                            className="w-full py-2 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-500 hover:border-emerald-500 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 text-sm"
+                        >
+                            <Plus size={16} /> Ajouter une option
+                        </button>
+                    </div>
+                </div>
+
                 {/* Description */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</label>
@@ -455,6 +535,62 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                     value={data.productInfo?.traceabilityDocuments}
                                     onChange={(e) => handleInfoChange('traceabilityDocuments', e.target.value)}
                                     placeholder="Ex: Factures fournisseurs, Certificats d'origine..."
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
+                                />
+                            </div>
+
+                            {/* Materials List */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Liste des matériaux</label>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {data.productInfo?.materialsList?.map((mat, index) => (
+                                        <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs">
+                                            {mat}
+                                            <button type="button" onClick={() => {
+                                                const newList = data.productInfo?.materialsList?.filter((_, i) => i !== index) || [];
+                                                setData(prev => ({
+                                                    ...prev,
+                                                    productInfo: { ...prev.productInfo!, materialsList: newList }
+                                                }));
+                                            }}>
+                                                <X size={10} />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Ajouter un matériau (Entrée)"
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const value = (e.target as HTMLInputElement).value.trim();
+                                            if (value) {
+                                                setData(prev => ({
+                                                    ...prev,
+                                                    productInfo: {
+                                                        ...prev.productInfo!,
+                                                        materialsList: [...(prev.productInfo?.materialsList || []), value]
+                                                    }
+                                                }));
+                                                (e.target as HTMLInputElement).value = '';
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+
+                            {/* Additional Info */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Informations additionnelles</label>
+                                <textarea
+                                    value={data.productInfo?.additionalInfo || ''}
+                                    onChange={(e) => setData(prev => ({
+                                        ...prev,
+                                        productInfo: { ...prev.productInfo!, additionalInfo: e.target.value }
+                                    }))}
+                                    placeholder="Toute information complémentaire sur le produit..."
                                     className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
                                 />
                             </div>

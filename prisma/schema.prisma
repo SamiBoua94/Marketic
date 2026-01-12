@@ -24,12 +24,18 @@ model Shop {
   name                 String
   description          String?
   address              String?
+  city                 String?
+  postalCode           String?
+  legalStatus          String?
   email                String?
   phone                String?
   siret                String?
   instagram            String?
   facebook             String?
   twitter              String?
+  tiktok               String?
+  youtube              String?
+  tags                 String?  // JSON string for shop tags
   profilePicture       String?
   bannerPicture        String?
   certificationPicture String?
@@ -49,6 +55,7 @@ model Product {
   images      String?  // JSON string or comma separated
   tags        String?  // JSON string
   productInfo String?  // JSON string containing materials, sources, etc.
+  options     String?  // JSON string for product options (color, size, etc.)
   category    String?
   shopId      String
   shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)

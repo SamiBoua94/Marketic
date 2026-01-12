@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
                 images: data.images ? JSON.stringify(data.images) : null,
                 tags: data.tags ? JSON.stringify(data.tags) : null,
                 productInfo: data.productInfo ? JSON.stringify(data.productInfo) : null,
+                options: data.options ? JSON.stringify(data.options) : null,
                 category: data.category,
                 shopId: shop.id
             }
