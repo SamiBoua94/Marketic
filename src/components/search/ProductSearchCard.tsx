@@ -10,12 +10,6 @@ export function ProductSearchCard({ product }: { product: MockProduct }) {
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute top-3 right-3">
-                    <div className="bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                        <Award size={14} />
-                        {product.score}%
-                    </div>
-                </div>
             </div>
 
             <div className="p-5">

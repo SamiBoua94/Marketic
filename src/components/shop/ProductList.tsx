@@ -53,13 +53,7 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                     tags = [];
                 }
 
-                let score = 0;
-                try {
-                    const info = product.productInfo ? JSON.parse(product.productInfo as string) : null;
-                    score = info?.ethicalScore || 0;
-                } catch {
-                    score = 0;
-                }
+
 
                 return (
                     <div key={product.id} className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden group hover:shadow-md transition-shadow">
@@ -117,11 +111,6 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                                 </div>
                                 <div className="text-right">
                                     <span className="font-bold text-zinc-900 dark:text-white">{product.price.toFixed(2)} €</span>
-                                    {score > 0 && (
-                                        <div className="text-[10px] font-bold text-emerald-600 flex items-center justify-end gap-1 mt-1">
-                                            Score: {score}%
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                             <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-4 h-10">

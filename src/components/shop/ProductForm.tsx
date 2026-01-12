@@ -31,7 +31,6 @@ interface ProductInfo {
     materialsList?: string[];
     additionalInfo?: string;
     proofs?: string[];
-    ethicalScore?: number;
 }
 
 interface ProductFormProps {
@@ -88,8 +87,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             handmadeOrPurchased: '',
             supplyChainSteps: '',
             traceabilityDocuments: '',
-            proofs: [],
-            ethicalScore: 0
+            proofs: []
         };
         if (typeof initialData.productInfo === 'string') {
             try { processedInfo = JSON.parse(initialData.productInfo); } catch (e) { }
@@ -112,18 +110,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     const fileInputRef = useRef<HTMLInputElement>(null);
     const proofInputRef = useRef<HTMLInputElement>(null);
 
-    const calculateScore = (info: ProductInfo) => {
-        let filledCount = 0;
-        if (info.materials?.trim()) filledCount++;
-        if (info.materialSources?.trim()) filledCount++;
-        if (info.purchaseLocation?.trim()) filledCount++;
-        if (info.handmadeOrPurchased?.trim()) filledCount++;
-        if (info.supplyChainSteps?.trim()) filledCount++;
-        if (info.traceabilityDocuments?.trim()) filledCount++;
-        if (info.proofs && info.proofs.length > 0) filledCount++;
 
-        return Math.round((filledCount / 7) * 100);
-    };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isProof: boolean = false) => {
         const file = e.target.files?.[0];
@@ -151,10 +138,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     };
                     return {
                         ...prev,
-                        productInfo: {
-                            ...newInfo,
-                            ethicalScore: calculateScore(newInfo)
-                        }
+                        productInfo: newInfo
                     };
                 });
             } else {
@@ -186,10 +170,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             };
             return {
                 ...prev,
-                productInfo: {
-                    ...newInfo,
-                    ethicalScore: calculateScore(newInfo)
-                }
+                productInfo: newInfo
             };
         });
     };
@@ -222,10 +203,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             };
             return {
                 ...prev,
-                productInfo: {
-                    ...newInfo,
-                    ethicalScore: calculateScore(newInfo)
-                }
+                productInfo: newInfo
             };
         });
     };
@@ -462,15 +440,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                 <span className="text-xs text-zinc-500">Transparence et traçabilité pour vos clients</span>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            {data.productInfo?.ethicalScore !== undefined && (
-                                <div className="flex items-center gap-1 px-3 py-1 bg-emerald-500 text-white rounded-full text-xs font-bold">
-                                    <Award size={14} />
-                                    Score: {data.productInfo.ethicalScore}%
-                                </div>
-                            )}
-                            <Plus className={`transition-transform ${showProductInfo ? 'rotate-45' : ''}`} />
-                        </div>
+                        <Plus className={`transition-transform ${showProductInfo ? 'rotate-45' : ''}`} />
                     </button>
 
                     {showProductInfo && (
