@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { useState, useRef, useEffect } from 'react';
@@ -127,6 +127,14 @@ export function Header() {
                                     >
                                         <User className="w-4 h-4" />
                                         Mon Profil
+                                    </Link>
+                                    <Link
+                                        href="/messages"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                    >
+                                        <MessageSquare className="w-4 h-4" />
+                                        Messagerie
                                     </Link>
                                     <Link
                                         href="/shop"
