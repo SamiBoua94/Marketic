@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
-import { Header } from "@/components/layout/header";
+import { HeaderSwitcher } from "@/components/layout/header-switcher";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/context/auth-context";
 import "./globals.css";
@@ -31,7 +31,7 @@ export default function RootLayout({
                 className={`${inter.variable} ${outfit.variable} antialiased min-h-screen flex flex-col font-sans`}
             >
                 <AuthProvider>
-                    <Header />
+                    <HeaderSwitcher />
                     <main className="flex-1">
                         {children}
                     </main>
