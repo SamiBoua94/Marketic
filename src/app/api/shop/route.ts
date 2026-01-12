@@ -74,6 +74,11 @@ export async function PUT(request: NextRequest) {
         // Remove id, userId, and user relation from update data to prevent errors
         const { id, userId, user, createdAt, updatedAt, ...updateData } = data;
 
+        // Convert tags array to JSON string if it's an array
+        if (Array.isArray(updateData.tags)) {
+            updateData.tags = JSON.stringify(updateData.tags);
+        }
+
         const shop = await prisma.shop.update({
             where: { userId: session.id },
             data: updateData
