@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck, Store, Package, UserPlus, ArrowLeft, Trash2, Edit2, X, CheckCircle2, Lock } from "lucide-react";
+import { ShieldCheck, Store, Package, UserPlus, ArrowLeft, Trash2, Edit2, X, CheckCircle2, Lock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminUser {
     id: string;
     pseudo: string;
     email: string;
-    role: 'Administrateur' | 'Modérateur' | 'Support';
+    role: 'Administrateur' | 'Support';
     createdAt: string;
 }
 
 export default function AdminPage() {
-    const [activeTab, setActiveTab] = useState<'welcome' | 'roles' | 'shops' | 'articles'>('welcome');
+    const [activeTab, setActiveTab] = useState<'welcome' | 'users' | 'roles' | 'shops' | 'articles'>('welcome');
 
     // User Management State
     const [users, setUsers] = useState<AdminUser[]>([
@@ -109,6 +109,8 @@ export default function AdminPage() {
                                 Menu Principal
                             </h2>
                             <nav className="space-y-2">
+
+
                                 <Button
                                     variant="ghost"
                                     onClick={() => setActiveTab('roles')}
@@ -134,6 +136,15 @@ export default function AdminPage() {
                                 >
                                     <Package className={`w-5 h-5 ${activeTab === 'articles' ? 'text-primary' : 'text-foreground/40 group-hover:text-primary'}`} />
                                     <span className="font-semibold">Gestion des articles</span>
+                                </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => setActiveTab('users')}
+                                    className={`w-full justify-start gap-4 h-12 px-4 transition-all duration-200 group border border-transparent ${activeTab === 'users' ? 'bg-primary/10 text-primary border-primary/10' : 'hover:bg-primary/5 hover:text-primary hover:border-primary/10'}`}
+                                >
+                                    <Users className={`w-5 h-5 ${activeTab === 'users' ? 'text-primary' : 'text-foreground/40 group-hover:text-primary'}`} />
+                                    <span className="font-semibold">Gestion des utilisateurs</span>
                                 </Button>
                             </nav>
                         </div>
@@ -194,8 +205,7 @@ export default function AdminPage() {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'Administrateur' ? 'bg-red-50 text-red-700 border border-red-100' :
-                                                                user.role === 'Modérateur' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
-                                                                    'bg-green-50 text-green-700 border border-green-100'
+                                                                'bg-green-50 text-green-700 border border-green-100'
                                                                 }`}>
                                                                 {user.role}
                                                             </span>
@@ -300,8 +310,8 @@ export default function AdminPage() {
                                         <button
                                             onClick={() => setArticleFilter('pending')}
                                             className={`flex-1 min-w-[150px] max-w-[250px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${articleFilter === 'pending'
-                                                    ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-lg shadow-amber-500/10'
-                                                    : 'bg-white border-secondary/10 text-foreground/40 hover:border-amber-200 hover:text-amber-600'
+                                                ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-lg shadow-amber-500/10'
+                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-amber-200 hover:text-amber-600'
                                                 }`}
                                         >
                                             En attente
@@ -309,8 +319,8 @@ export default function AdminPage() {
                                         <button
                                             onClick={() => setArticleFilter('accepted')}
                                             className={`flex-1 min-w-[150px] max-w-[250px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${articleFilter === 'accepted'
-                                                    ? 'bg-green-50 border-green-500 text-green-700 shadow-lg shadow-green-500/10'
-                                                    : 'bg-white border-secondary/10 text-foreground/40 hover:border-green-200 hover:text-green-600'
+                                                ? 'bg-green-50 border-green-500 text-green-700 shadow-lg shadow-green-500/10'
+                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-green-200 hover:text-green-600'
                                                 }`}
                                         >
                                             Acceptés
@@ -318,8 +328,8 @@ export default function AdminPage() {
                                         <button
                                             onClick={() => setArticleFilter('refused')}
                                             className={`flex-1 min-w-[150px] max-w-[250px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${articleFilter === 'refused'
-                                                    ? 'bg-red-50 border-red-500 text-red-700 shadow-lg shadow-red-500/10'
-                                                    : 'bg-white border-secondary/10 text-foreground/40 hover:border-red-200 hover:text-red-600'
+                                                ? 'bg-red-50 border-red-500 text-red-700 shadow-lg shadow-red-500/10'
+                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-red-200 hover:text-red-600'
                                                 }`}
                                         >
                                             Refusés
@@ -329,8 +339,8 @@ export default function AdminPage() {
                                     {/* Articles List Placeholder */}
                                     <div className="bg-secondary/2 rounded-3xl border-2 border-dashed border-secondary/20 p-20 flex flex-col items-center justify-center text-center">
                                         <div className={`p-5 rounded-full shadow-sm mb-6 ${articleFilter === 'pending' ? 'bg-amber-100 text-amber-600' :
-                                                articleFilter === 'accepted' ? 'bg-green-100 text-green-600' :
-                                                    'bg-red-100 text-red-600'
+                                            articleFilter === 'accepted' ? 'bg-green-100 text-green-600' :
+                                                'bg-red-100 text-red-600'
                                             }`}>
                                             <Package className="w-10 h-10" />
                                         </div>
@@ -425,7 +435,6 @@ export default function AdminPage() {
                                         className="w-full h-12 px-4 rounded-xl border border-secondary/20 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
                                     >
                                         <option value="Administrateur">Administrateur</option>
-                                        <option value="Modérateur">Modérateur</option>
                                         <option value="Support">Support</option>
                                     </select>
                                 </div>
