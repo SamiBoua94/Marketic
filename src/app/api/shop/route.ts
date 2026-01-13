@@ -46,6 +46,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Une boutique existe déjà pour cet utilisateur' }, { status: 400 });
         }
 
+        // Convert tags array to JSON string if it's an array
+        if (Array.isArray(data.tags)) {
+            data.tags = JSON.stringify(data.tags);
+        }
+
         const shop = await prisma.shop.create({
             data: {
                 ...data,
