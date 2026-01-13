@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import { hashPassword } from '@/utils/helpers';
+import { prisma } from '../../src/lib/prisma.ts';
+import { hashPassword } from '../../src/utils/helpers.ts';
 
 async function main() {
     console.log('🌱 Starting database seed...');
