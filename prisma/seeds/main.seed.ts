@@ -4,6 +4,13 @@ import { hashPassword } from '../../src/utils/helpers.ts';
 async function main() {
     console.log('🌱 Starting database seed...');
 
+    // If DB already has users, skip seeding unless force flag is set
+    const existingUsers = await prisma.user.count();
+    if (existingUsers > 0 && process.env.FORCE_DB_RESET !== 'true') {
+        console.log(`⚠️  Database already contains ${existingUsers} user(s) — skipping seed. Set FORCE_DB_RESET=true to force reseed.`);
+        return;
+    }
+
     try {
         // Delete existing data in the correct order
         console.log('🗑️  Cleaning database...');

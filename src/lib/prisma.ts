@@ -17,4 +17,16 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
+export let prismaIsConnected = false;
+
+// Try connecting to DB (non-blocking) so routes can check availability
+(async () => {
+    try {
+        await prisma.$connect();
+        prismaIsConnected = true;
+    } catch (err) {
+        console.warn('Prisma: Could not connect to the database. Some endpoints will return limited data. Error:', (err as Error)?.message ?? err);
+    }
+})();
+
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
