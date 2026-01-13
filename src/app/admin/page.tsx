@@ -1,101 +1,178 @@
 "use client";
 
-import { useState } from "react";
-import { ShieldCheck, Store, Package, UserPlus, ArrowLeft, Trash2, Edit2, X, CheckCircle2, Lock, Users } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShieldCheck, Store, Package, Plus, Trash2, Edit2, X, CheckCircle2, Lock, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminUser {
     id: string;
-    pseudo: string;
+    name: string;
     email: string;
-    role: 'Administrateur' | 'Support';
+    description?: string;
+    role?: 'Administrateur' | 'Support';
     createdAt: string;
 }
 
+const AVAILABLE_ROLES = [
+    { id: 'admin', label: 'Administrateur', color: 'red' },
+    { id: 'support', label: 'Support', color: 'green' }
+];
+
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<'welcome' | 'users' | 'roles' | 'shops' | 'articles'>('welcome');
+    const [isLoading, setIsLoading] = useState(true);
+    const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
+    const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
 
-    // User Management State
-    const [users, setUsers] = useState<AdminUser[]>([
-        { id: '1', pseudo: 'Admin_Sami', email: 'sami@marketic.fr', role: 'Administrateur', createdAt: '12/01/2026' },
-    ]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+    // Load users on mount
+    useEffect(() => {
+        loadUsers();
+    }, []);
+
+    const loadUsers = async () => {
+        try {
+            setIsLoading(true);
+            const response = await fetch('/api/v1/users');
+            if (response.ok) {
+                const result = await response.json();
+                const users = result.data || [];
+                setAllUsers(users);
+                // Filter admin users (those with description 'Admin' or 'Support')
+                const adminList = users.filter((u: any) => u.description === 'Admin' || u.description === 'Support');
+                setAdminUsers(adminList);
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des utilisateurs:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Security State
     const [isVerifying, setIsVerifying] = useState(false);
     const [verificationPassword, setVerificationPassword] = useState('');
-    const [pendingAction, setPendingAction] = useState<{ type: 'edit' | 'delete', user: AdminUser | string } | null>(null);
-
-    // Shops State
-    const [shopFilter, setShopFilter] = useState<'pending' | 'validated' | 'refused'>('pending');
-
-    // Articles State
-    const [articleFilter, setArticleFilter] = useState<'pending' | 'accepted' | 'refused' | 'reported'>('pending');
+    const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
-        pseudo: '',
+        name: '',
         email: '',
         password: '',
-        role: 'Support' as AdminUser['role']
+        role: 'Support' as 'Administrateur' | 'Support'
     });
 
-    const handleOpenModal = (user?: AdminUser) => {
+    const openModal = (user?: AdminUser) => {
+        console.log('openModal called');
         if (user) {
-            setPendingAction({ type: 'edit', user });
-            setIsVerifying(true);
+            setEditingUser(user);
+            setFormData({
+                name: user.name,
+                email: user.email,
+                password: '',
+                role: user.description === 'Admin' ? 'Administrateur' : 'Support'
+            });
         } else {
             setEditingUser(null);
-            setFormData({ pseudo: '', email: '', password: '', role: 'Support' });
-            setIsModalOpen(true);
+            setFormData({ name: '', email: '', password: '', role: 'Support' });
+        }
+        setErrorMessage('');
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log('handleSubmit called with formData:', formData);
+        
+        if (!formData.name.trim()) {
+            setErrorMessage('Le nom est requis');
+            return;
+        }
+        
+        if (!formData.email.includes('@')) {
+            setErrorMessage('Email invalide');
+            return;
+        }
+
+        setIsSubmitting(true);
+        
+        try {
+            if (editingUser) {
+                // Update user
+                const response = await fetch(`/api/v1/users/${editingUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formData.name,
+                        email: formData.email,
+                        ...(formData.password && { password: formData.password }),
+                        role: formData.role
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || error.message || 'Erreur lors de la mise à jour');
+                }
+            } else {
+                // Create new user
+                if (!formData.password) {
+                    setErrorMessage('Le mot de passe est requis');
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                const response = await fetch('/api/v1/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formData.name,
+                        email: formData.email,
+                        password: formData.password,
+                        role: formData.role
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || error.message || 'Erreur lors de la création');
+                }
+            }
+
+            // Reload users
+            await loadUsers();
+            setIsModalOpen(false);
+        } catch (error: any) {
+            setErrorMessage(error.message || 'Une erreur est survenue');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const handleDelete = (id: string) => {
-        setPendingAction({ type: 'delete', user: id });
-        setIsVerifying(true);
-    };
-
-    const confirmSecurity = (e: React.FormEvent) => {
+    const confirmDelete = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulation de vérification du mot de l'admin actuel
-        if (verificationPassword.length > 0) {
-            const action = pendingAction;
-            setVerificationPassword('');
-            setIsVerifying(false);
-            setPendingAction(null);
-
-            if (action?.type === 'edit') {
-                const user = action.user as AdminUser;
-                setEditingUser(user);
-                setFormData({
-                    pseudo: user.pseudo,
-                    email: user.email,
-                    password: '',
-                    role: user.role
+        if (verificationPassword.length > 0 && pendingDelete) {
+            try {
+                const response = await fetch(`/api/v1/users/${pendingDelete}`, {
+                    method: 'DELETE'
                 });
-                setIsModalOpen(true);
-            } else if (action?.type === 'delete') {
-                const id = action.user as string;
-                setUsers(users.filter(u => u.id !== id));
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la suppression');
+                }
+
+                // Reload users
+                await loadUsers();
+                setVerificationPassword('');
+                setIsVerifying(false);
+                setPendingDelete(null);
+            } catch (error: any) {
+                setErrorMessage(error.message || 'Erreur lors de la suppression');
             }
         }
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (editingUser) {
-            setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u));
-        } else {
-            const newUser: AdminUser = {
-                id: Math.random().toString(36).substr(2, 9),
-                ...formData,
-                createdAt: new Date().toLocaleDateString('fr-FR')
-            };
-            setUsers([...users, newUser]);
-        }
-        setIsModalOpen(false);
     };
 
     return (
@@ -109,8 +186,6 @@ export default function AdminPage() {
                                 Menu Principal
                             </h2>
                             <nav className="space-y-2">
-
-
                                 <Button
                                     variant="ghost"
                                     onClick={() => setActiveTab('roles')}
@@ -150,209 +225,168 @@ export default function AdminPage() {
                         </div>
                     </aside>
 
-                    {/* Zone de Contenu Principale */}
+                    {/* Main Content */}
                     <main className="flex-1">
                         <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-secondary/10 min-h-[600px]">
-                            {activeTab === 'welcome' && (
-                                <div className="h-full flex flex-col justify-center items-center text-center py-12">
-                                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
-                                        <ShieldCheck className="w-10 h-10" />
-                                    </div>
-                                    <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
-                                        Bienvenue sur <span className="text-primary">MarkAdmin</span>
-                                    </h1>
-                                    <p className="text-lg text-foreground/60 max-w-md leading-relaxed">
-                                        Gérez les accès, les boutiques et le catalogue depuis votre interface sécurisée.
-                                    </p>
-                                </div>
-                            )}
-
+                            {/* Roles Tab - Gestion des comptes admin/support */}
                             {activeTab === 'roles' && (
                                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-secondary/10 pb-6">
                                         <div>
                                             <h2 className="text-2xl font-bold text-foreground">Gestion des rôles</h2>
-                                            <p className="text-foreground/60">Gérez les privilèges et les permissions des utilisateurs.</p>
+                                            <p className="text-foreground/60">Créez des comptes administrateur et support.</p>
                                         </div>
                                         <Button
-                                            onClick={() => handleOpenModal()}
+                                            onClick={() => openModal()}
                                             className="gap-2 bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all duration-300"
                                         >
-                                            <UserPlus className="w-5 h-5" />
-                                            Nouvel utilisateur
+                                            <Plus className="w-5 h-5" />
+                                            Nouveau compte
                                         </Button>
                                     </div>
 
-                                    {/* Table des utilisateurs */}
-                                    <div className="overflow-x-auto border border-secondary/10 rounded-2xl">
-                                        <table className="w-full text-left border-collapse">
-                                            <thead className="bg-[#F8FAFC]">
-                                                <tr>
-                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Utilisateur</th>
-                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Rôle</th>
-                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Date Création</th>
-                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10 text-right">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-secondary/10">
-                                                {users.map((user) => (
-                                                    <tr key={user.id} className="hover:bg-secondary/5 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex flex-col">
-                                                                <span className="font-semibold text-foreground">{user.pseudo}</span>
-                                                                <span className="text-xs text-foreground/40">{user.email}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'Administrateur' ? 'bg-red-50 text-red-700 border border-red-100' :
-                                                                'bg-green-50 text-green-700 border border-green-100'
-                                                                }`}>
-                                                                {user.role}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-sm text-foreground/50">{user.createdAt}</td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <div className="flex justify-end gap-2">
-                                                                <button
-                                                                    onClick={() => handleOpenModal(user)}
-                                                                    className="p-2 text-foreground/40 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                                                                >
-                                                                    <Edit2 className="w-4 h-4" />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDelete(user.id)}
-                                                                    className="p-2 text-foreground/40 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-                                                        </td>
+                                    {isLoading ? (
+                                        <div className="flex justify-center items-center py-12">
+                                            <p className="text-foreground/60">Chargement...</p>
+                                        </div>
+                                    ) : adminUsers.length === 0 ? (
+                                        <div className="bg-secondary/2 rounded-3xl border-2 border-dashed border-secondary/20 p-20 flex flex-col items-center justify-center text-center">
+                                            <div className="p-5 rounded-full shadow-sm mb-6 bg-amber-100 text-amber-600">
+                                                <ShieldCheck className="w-10 h-10" />
+                                            </div>
+                                            <h3 className="text-xl font-bold text-foreground mb-2">Aucun compte créé</h3>
+                                            <p className="text-foreground/40 max-w-xs">
+                                                Créez un compte Admin ou Support en cliquant sur "Nouveau compte".
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="overflow-x-auto border border-secondary/10 rounded-2xl">
+                                            <table className="w-full text-left border-collapse">
+                                                <thead className="bg-[#F8FAFC]">
+                                                    <tr>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Nom</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Email</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Rôle</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Date Création</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10 text-right">Actions</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody className="divide-y divide-secondary/10">
+                                                    {adminUsers.map((user) => (
+                                                        <tr key={user.id} className="hover:bg-secondary/5 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <span className="font-semibold text-foreground">{user.name}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="text-sm text-foreground/60">{user.email}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.description === 'Admin' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-green-50 text-green-700 border border-green-100'}`}>
+                                                                    {user.description === 'Admin' ? 'Administrateur' : 'Support'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-sm text-foreground/50">{new Date(user.createdAt).toLocaleDateString('fr-FR')}</td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button
+                                                                        onClick={() => openModal(user)}
+                                                                        className="p-2 text-foreground/40 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                                                                    >
+                                                                        <Edit2 className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setPendingDelete(user.id);
+                                                                            setIsVerifying(true);
+                                                                        }}
+                                                                        className="p-2 text-foreground/40 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
-                            {activeTab === 'shops' && (
+                            {/* Users Tab - Tous les utilisateurs */}
+                            {activeTab === 'users' && (
                                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-secondary/10 pb-6">
                                         <div>
-                                            <h2 className="text-2xl font-bold text-foreground">Gestion des boutiques</h2>
-                                            <p className="text-foreground/60">Supervisez l'ouverture et la validation des boutiques.</p>
+                                            <h2 className="text-2xl font-bold text-foreground">Gestion des utilisateurs</h2>
+                                            <p className="text-foreground/60">Tous les utilisateurs créés dans la base de données.</p>
                                         </div>
                                     </div>
 
-                                    {/* Shops Status Filter Buttons */}
-                                    <div className="flex flex-wrap gap-4">
-                                        <button
-                                            onClick={() => setShopFilter('pending')}
-                                            className={`flex-1 min-w-[150px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${shopFilter === 'pending'
-                                                ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-lg shadow-amber-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-amber-200 hover:text-amber-600'
-                                                }`}
-                                        >
-                                            <span className={`w-2 h-2 rounded-full animate-pulse ${shopFilter === 'pending' ? 'bg-amber-500' : 'bg-transparent'}`} />
-                                            Demande en attente
-                                        </button>
-                                        <button
-                                            onClick={() => setShopFilter('validated')}
-                                            className={`flex-1 min-w-[150px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${shopFilter === 'validated'
-                                                ? 'bg-green-50 border-green-500 text-green-700 shadow-lg shadow-green-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-green-200 hover:text-green-600'
-                                                }`}
-                                        >
-                                            Validés
-                                        </button>
-                                        <button
-                                            onClick={() => setShopFilter('refused')}
-                                            className={`flex-1 min-w-[150px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${shopFilter === 'refused'
-                                                ? 'bg-red-50 border-red-500 text-red-700 shadow-lg shadow-red-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-red-200 hover:text-red-600'
-                                                }`}
-                                        >
-                                            Refusés
-                                        </button>
-                                    </div>
-
-                                    {/* Shops List Placeholder */}
-                                    <div className="bg-secondary/2 rounded-3xl border-2 border-dashed border-secondary/20 p-20 flex flex-col items-center justify-center text-center">
-                                        <div className={`p-5 rounded-full shadow-sm mb-6 ${shopFilter === 'pending' ? 'bg-amber-100 text-amber-600' :
-                                            shopFilter === 'validated' ? 'bg-green-100 text-green-600' :
-                                                'bg-red-100 text-red-600'
-                                            }`}>
-                                            <Store className="w-10 h-10" />
+                                    {isLoading ? (
+                                        <div className="flex justify-center items-center py-12">
+                                            <p className="text-foreground/60">Chargement...</p>
                                         </div>
-                                        <h3 className="text-xl font-bold text-foreground mb-2">
-                                            {shopFilter === 'pending' ? 'Aucune demande en attente' :
-                                                shopFilter === 'validated' ? 'Aucune boutique validée' :
-                                                    'Aucune demande refusée'}
-                                        </h3>
-                                        <p className="text-foreground/40 max-w-xs">
-                                            Les données des boutiques apparaîtront ici.
-                                        </p>
-                                    </div>
+                                    ) : allUsers.length === 0 ? (
+                                        <div className="bg-secondary/2 rounded-3xl border-2 border-dashed border-secondary/20 p-20 flex flex-col items-center justify-center text-center">
+                                            <div className="p-5 rounded-full shadow-sm mb-6 bg-amber-100 text-amber-600">
+                                                <Users className="w-10 h-10" />
+                                            </div>
+                                            <h3 className="text-xl font-bold text-foreground mb-2">Aucun utilisateur</h3>
+                                            <p className="text-foreground/40 max-w-xs mb-6">
+                                                Aucun utilisateur n'a été créé pour le moment.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="overflow-x-auto border border-secondary/10 rounded-2xl">
+                                            <table className="w-full text-left border-collapse">
+                                                <thead className="bg-[#F8FAFC]">
+                                                    <tr>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Nom</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Email</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Type</th>
+                                                        <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Date Création</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-secondary/10">
+                                                    {allUsers.map((user) => (
+                                                        <tr key={user.id} className="hover:bg-secondary/5 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <span className="font-semibold text-foreground">{user.name}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="text-sm text-foreground/60">{user.email}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.description === 'Admin' ? 'bg-red-50 text-red-700 border border-red-100' : user.description === 'Support' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
+                                                                    {user.description === 'Admin' ? 'Administrateur' : user.description === 'Support' ? 'Support' : 'Client'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-sm text-foreground/50">{new Date(user.createdAt).toLocaleDateString('fr-FR')}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
-                            {activeTab === 'articles' && (
-                                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-secondary/10 pb-6">
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-foreground">Gestion des articles</h2>
-                                            <p className="text-foreground/60">Modérez les articles publiés sur la plateforme.</p>
-                                        </div>
+                            {/* Shops & Articles placeholders */}
+                            {activeTab === 'shops' && <div className="text-center py-12"><p className="text-foreground/60">Gestion des boutiques (à configurer)</p></div>}
+                            {activeTab === 'articles' && <div className="text-center py-12"><p className="text-foreground/60">Gestion des articles (à configurer)</p></div>}
+                            {activeTab === 'welcome' && (
+                                <div className="h-full flex flex-col justify-center items-center text-center py-12">
+                                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
+                                        <ShieldCheck className="w-10 h-10" />
                                     </div>
-
-                                    {/* Articles Status Filter Buttons */}
-                                    <div className="flex flex-wrap gap-4 justify-center">
-                                        <button
-                                            onClick={() => setArticleFilter('pending')}
-                                            className={`flex-1 min-w-[150px] max-w-[250px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${articleFilter === 'pending'
-                                                ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-lg shadow-amber-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-amber-200 hover:text-amber-600'
-                                                }`}
-                                        >
-                                            En attente
-                                        </button>
-                                        <button
-                                            onClick={() => setArticleFilter('accepted')}
-                                            className={`flex-1 min-w-[150px] max-w-[250px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${articleFilter === 'accepted'
-                                                ? 'bg-green-50 border-green-500 text-green-700 shadow-lg shadow-green-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-green-200 hover:text-green-600'
-                                                }`}
-                                        >
-                                            Acceptés
-                                        </button>
-                                        <button
-                                            onClick={() => setArticleFilter('refused')}
-                                            className={`flex-1 min-w-[150px] max-w-[250px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${articleFilter === 'refused'
-                                                ? 'bg-red-50 border-red-500 text-red-700 shadow-lg shadow-red-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-red-200 hover:text-red-600'
-                                                }`}
-                                        >
-                                            Refusés
-                                        </button>
-                                    </div>
-
-                                    {/* Articles List Placeholder */}
-                                    <div className="bg-secondary/2 rounded-3xl border-2 border-dashed border-secondary/20 p-20 flex flex-col items-center justify-center text-center">
-                                        <div className={`p-5 rounded-full shadow-sm mb-6 ${articleFilter === 'pending' ? 'bg-amber-100 text-amber-600' :
-                                            articleFilter === 'accepted' ? 'bg-green-100 text-green-600' :
-                                                'bg-red-100 text-red-600'
-                                            }`}>
-                                            <Package className="w-10 h-10" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-foreground mb-2">
-                                            {articleFilter === 'pending' ? 'Aucun article en attente' :
-                                                articleFilter === 'accepted' ? 'Aucun article accepté' :
-                                                    'Aucun article refusé'}
-                                        </h3>
-                                        <p className="text-foreground/40 max-w-xs">
-                                            La liste des articles apparaîtra ici après modération.
-                                        </p>
-                                    </div>
+                                    <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                                        Bienvenue sur <span className="text-primary">MarkAdmin</span>
+                                    </h1>
+                                    <p className="text-lg text-foreground/60 max-w-md">
+                                        Gérez les accès, les boutiques et le catalogue.
+                                    </p>
                                 </div>
                             )}
                         </div>
@@ -360,51 +394,48 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {/* Modal de Vérification de Sécurité */}
+            {/* Security Verification Modal */}
             {isVerifying && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-secondary/10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+                    <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-secondary/10 flex flex-col overflow-hidden">
                         <div className="p-6 border-b border-secondary/10 flex items-center justify-between bg-red-50/50">
                             <div className="flex items-center gap-2 text-red-600">
                                 <Lock className="w-5 h-5" />
                                 <h3 className="text-lg font-bold">Sécurité requise</h3>
                             </div>
-                            <button onClick={() => { setIsVerifying(false); setPendingAction(null); setVerificationPassword(''); }} className="p-2 hover:bg-secondary/10 rounded-full transition-colors">
+                            <button onClick={() => { setIsVerifying(false); setPendingDelete(null); setVerificationPassword(''); }} className="p-2 hover:bg-secondary/10 rounded-full">
                                 <X className="w-5 h-5 text-foreground/40" />
                             </button>
                         </div>
 
-                        <form onSubmit={confirmSecurity} className="p-8 space-y-6">
+                        <form onSubmit={confirmDelete} className="p-8 space-y-6">
+                            {errorMessage && (
+                                <div className="flex gap-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                    <p>{errorMessage}</p>
+                                </div>
+                            )}
+
                             <p className="text-sm text-foreground/60 text-center">
-                                Pour modifier ou supprimer un rôle, veuillez saisir <strong>votre mot de passe</strong> administrateur pour confirmer.
+                                Confirmer en saisissant votre mot de passe administrateur.
                             </p>
 
-                            <div className="space-y-2">
-                                <input
-                                    type="password"
-                                    required
-                                    autoFocus
-                                    value={verificationPassword}
-                                    onChange={(e) => setVerificationPassword(e.target.value)}
-                                    placeholder="Votre mot de passe"
-                                    className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition-all text-center"
-                                />
-                            </div>
+                            <input
+                                type="password"
+                                required
+                                autoFocus
+                                value={verificationPassword}
+                                onChange={(e) => setVerificationPassword(e.target.value)}
+                                placeholder="Votre mot de passe"
+                                className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none text-center"
+                            />
 
                             <div className="flex gap-4">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => { setIsVerifying(false); setPendingAction(null); setVerificationPassword(''); }}
-                                    className="flex-1 rounded-xl h-12"
-                                >
+                                <Button variant="ghost" onClick={() => { setIsVerifying(false); setPendingDelete(null); }} className="flex-1 rounded-xl h-12">
                                     Annuler
                                 </Button>
-                                <Button
-                                    type="submit"
-                                    className="flex-1 rounded-xl h-12 bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20"
-                                >
-                                    Confirmer
+                                <Button type="submit" className="flex-1 rounded-xl h-12 bg-red-600 hover:bg-red-700 text-white">
+                                    Supprimer
                                 </Button>
                             </div>
                         </form>
@@ -412,85 +443,79 @@ export default function AdminPage() {
                 </div>
             )}
 
-            {/* Modal de Création/Édition */}
+            {/* Account Modal - Create/Edit Admin or Support */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-secondary/10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-secondary/10 flex flex-col overflow-hidden">
                         <div className="p-6 border-b border-secondary/10 flex items-center justify-between bg-primary/5">
                             <h3 className="text-xl font-bold text-foreground">
-                                {editingUser ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}
+                                {editingUser ? 'Modifier le compte' : 'Nouveau compte'}
                             </h3>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-secondary/10 rounded-full transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-secondary/10 rounded-full">
                                 <X className="w-5 h-5 text-foreground/40" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground/60 ml-1">Rôle</label>
-                                    <select
-                                        value={formData.role}
-                                        onChange={(e) => setFormData({ ...formData, role: e.target.value as AdminUser['role'] })}
-                                        className="w-full h-12 px-4 rounded-xl border border-secondary/20 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
-                                    >
-                                        <option value="Administrateur">Administrateur</option>
-                                        <option value="Support">Support</option>
-                                    </select>
+                            {errorMessage && (
+                                <div className="flex gap-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                    <p>{errorMessage}</p>
                                 </div>
+                            )}
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground/60 ml-1">Pseudo</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.pseudo}
-                                        onChange={(e) => setFormData({ ...formData, pseudo: e.target.value })}
-                                        placeholder="Pseudo"
-                                        className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-foreground/60 ml-1">Rôle</label>
+                                <select
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'Administrateur' | 'Support' })}
+                                    className="w-full h-12 px-4 rounded-xl border border-secondary/20 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                >
+                                    <option value="Support">Support</option>
+                                    <option value="Administrateur">Administrateur</option>
+                                </select>
+                            </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground/60 ml-1">Email</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        placeholder="Email"
-                                        className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-foreground/60 ml-1">Nom</label>
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Nom complet"
+                                    className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                />
+                            </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-foreground/60 ml-1">Mot de passe</label>
-                                    <input
-                                        type="password"
-                                        required={!editingUser}
-                                        value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        placeholder={editingUser ? "Laisser vide si inchangé" : "••••••••"}
-                                        className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-foreground/60 ml-1">Email</label>
+                                <input
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    placeholder="Email"
+                                    className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-foreground/60 ml-1">Mot de passe</label>
+                                <input
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    placeholder={editingUser ? "Laisser vide si inchangé" : "••••••••"}
+                                    className="w-full h-12 px-4 rounded-xl border border-secondary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                />
                             </div>
 
                             <div className="flex gap-4 pt-4">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 rounded-xl h-12"
-                                >
+                                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl h-12" disabled={isSubmitting}>
                                     Annuler
                                 </Button>
-                                <Button
-                                    type="submit"
-                                    className="flex-1 rounded-xl h-12 bg-primary text-white shadow-lg shadow-primary/20 gap-2"
-                                >
-                                    {editingUser ? <Edit2 className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                                    {editingUser ? 'Mettre à jour' : 'Enregistrer'}
+                                <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary text-white gap-2" disabled={isSubmitting}>
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
                                 </Button>
                             </div>
                         </form>

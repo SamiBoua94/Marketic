@@ -17,24 +17,20 @@ export default function ShopPage() {
 
     const fetchShopAndProducts = async () => {
         try {
-            // Fetch Shop (which now includes products via the updated API)
-            const res = await fetch('/api/products'); // We use the products endpoint to get products list directly or modify shop endpoint
-            // Actually, let's keep it simple. The shop endpoint returns shop data.
-            // But we need products.
-
-            // Let's call /api/products (GET) which returns { products: [] }
-            const productsRes = await fetch('/api/products');
-            if (productsRes.ok) {
-                const productsData = await productsRes.json();
-                setProducts(productsData.products || []);
-            }
-
-            // Also fetch basic shop info if needed, but maybe /api/products returns what we need?
-            // The previous code fetched /api/shop. Let's do both or consolidate.
+            // Fetch Shop
             const shopRes = await fetch('/api/shop');
             if (shopRes.ok) {
                 const shopData = await shopRes.json();
-                setShop(shopData.shop);
+                // Extract data from the response structure
+                setShop(shopData.data || shopData.shop);
+            }
+
+            // Fetch Products (if authenticated)
+            const productsRes = await fetch('/api/products');
+            if (productsRes.ok) {
+                const productsData = await productsRes.json();
+                // Extract data from the response structure
+                setProducts(productsData.data || productsData.products || []);
             }
 
         } catch (error) {

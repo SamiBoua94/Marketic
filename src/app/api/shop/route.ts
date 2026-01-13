@@ -1,24 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { handleError, successResponse } from '@/middleware/error.handler';
+import { UnauthorizedException, BadRequestException, ConflictException } from '@/exceptions/http.exception';
 
 export async function GET(request: NextRequest) {
     try {
         const session = await getSession();
-        console.log('GET /api/shop - Session:', session?.id);
         if (!session) {
-            return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+            throw new UnauthorizedException('Non autorisé');
         }
 
         const shop = await prisma.shop.findUnique({
             where: { userId: session.id },
-            include: { user: { select: { name: true, email: true } } }
+            include: { user: { select: { name: true, email: true } }, products: true }
         });
 
-        return NextResponse.json({ shop });
+        return successResponse(shop);
     } catch (error) {
-        console.error('Error fetching shop:', error);
-        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+        return handleError(error);
     }
 }
 
@@ -26,39 +26,59 @@ export async function POST(request: NextRequest) {
     try {
         const session = await getSession();
         if (!session) {
-            return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+            throw new UnauthorizedException('Non autorisé');
         }
 
         const data = await request.json();
         console.log('POST /api/shop - Payload:', data);
 
-        // Validation simple
-        if (!data.name) {
-            return NextResponse.json({ error: 'Le nom de la boutique est requis' }, { status: 400 });
+        // Validation
+        if (!data.name || !data.name.trim()) {
+            throw new BadRequestException('Le nom de la boutique est requis');
         }
 
         // Check if shop already exists
         const existingShop = await prisma.shop.findUnique({
-            where: { userId: session.id },
+            where: { userId: session.id }
         });
 
         if (existingShop) {
-            return NextResponse.json({ error: 'Une boutique existe déjà pour cet utilisateur' }, { status: 400 });
+            throw new ConflictException('Une boutique existe déjà pour cet utilisateur');
         }
 
+        // Prepare shop data
+        const shopData = {
+            name: data.name,
+            description: data.description || null,
+            address: data.address || null,
+            city: data.city || null,
+            postalCode: data.postalCode || null,
+            email: data.email || null,
+            phone: data.phone || null,
+            siret: data.siret || null,
+            legalStatus: data.legalStatus || null,
+            instagram: data.instagram || null,
+            facebook: data.facebook || null,
+            twitter: data.twitter || null,
+            tiktok: data.tiktok || null,
+            youtube: data.youtube || null,
+            profilePicture: data.profilePicture || null,
+            bannerPicture: data.bannerPicture || null,
+            certificationPicture: data.certificationPicture || null,
+            tags: data.tags ? (Array.isArray(data.tags) ? JSON.stringify(data.tags) : data.tags) : null,
+            userId: session.id
+        };
+
         const shop = await prisma.shop.create({
-            data: {
-                ...data,
-                userId: session.id
-            }
+            data: shopData,
+            include: { products: true }
         });
 
         console.log('POST /api/shop - Created:', shop);
 
-        return NextResponse.json({ shop });
+        return successResponse(shop, 201);
     } catch (error) {
-        console.error('Error creating shop:', error);
-        return NextResponse.json({ error: 'Erreur lors de la création de la boutique' }, { status: 500 });
+        return handleError(error);
     }
 }
 
@@ -66,17 +86,19 @@ export async function PUT(request: NextRequest) {
     try {
         const session = await getSession();
         if (!session) {
-            return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
+            throw new UnauthorizedException('Non autorisé');
         }
 
         const data = await request.json();
 
-        // Remove id, userId, and user relation from update data to prevent errors
-        const { id, userId, user, createdAt, updatedAt, ...updateData } = data;
+        // Remove system fields
+        const { id, userId, user, createdAt, updatedAt, products, ...updateData } = data;
 
         // Convert tags array to JSON string if it's an array
         if (Array.isArray(updateData.tags)) {
             updateData.tags = JSON.stringify(updateData.tags);
+        } else if (!updateData.tags) {
+            updateData.tags = null;
         }
 
         const shop = await prisma.shop.update({
@@ -84,9 +106,8 @@ export async function PUT(request: NextRequest) {
             data: updateData
         });
 
-        return NextResponse.json({ shop });
+        return successResponse(shop);
     } catch (error) {
-        console.error('Error updating shop:', error);
-        return NextResponse.json({ error: 'Erreur lors de la mise à jour de la boutique' }, { status: 500 });
+        return handleError(error);
     }
 }

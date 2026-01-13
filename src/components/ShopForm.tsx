@@ -117,18 +117,20 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                 body: JSON.stringify(data),
             });
 
+            const result = await res.json();
+
             if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error || 'Une erreur est survenue');
+                throw new Error(result.error || result.message || 'Une erreur est survenue');
             }
 
+            // Success - call the parent callback to refresh
             onSuccess();
-            // Important: If we just created, the parent will re-fetch and pass new initialData.
-            // But to avoid flicker or state issues, let's assume success means we should go to view mode.
+            // Go to view mode after successful save
             setIsEditMode(false);
 
         } catch (error: any) {
             alert("Erreur: " + error.message);
+            console.error('Form submission error:', error);
         } finally {
             setLoading(false);
         }
