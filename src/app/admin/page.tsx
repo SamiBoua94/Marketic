@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck, Store, Package, UserPlus, ArrowLeft, Trash2, Edit2, X, CheckCircle2, Lock, Users } from "lucide-react";
+import { ShieldCheck, Store, Package, UserPlus, ArrowLeft, Trash2, Edit2, X, CheckCircle2, Lock, Users, Eye, Globe, Phone, MapPin, Info, Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminUser {
@@ -25,10 +25,42 @@ export default function AdminPage() {
     // Security State
     const [isVerifying, setIsVerifying] = useState(false);
     const [verificationPassword, setVerificationPassword] = useState('');
-    const [pendingAction, setPendingAction] = useState<{ type: 'edit' | 'delete', user: AdminUser | string } | null>(null);
+    const [pendingAction, setPendingAction] = useState<{ type: 'edit' | 'delete' | 'delete_shop', user?: AdminUser | string, id?: string } | null>(null);
 
     // Shops State
-    const [shopFilter, setShopFilter] = useState<'pending' | 'validated' | 'refused'>('pending');
+    const [shops, setShops] = useState([
+        {
+            id: '1',
+            name: 'Ma Boutique Bio',
+            description: 'Produits issus de l\'agriculture biologique et locale.',
+            address: '12 rue de la Paix',
+            city: 'Paris',
+            postalCode: '75002',
+            legalStatus: 'SARL',
+            email: 'contact@bio.fr',
+            phone: '01 23 45 67 89',
+            siret: '123 456 789 00012',
+            instagram: '@maboutiquebio',
+            facebook: 'maboutiquebio',
+            tags: '["Bio", "Local", "Éthique"]',
+            createdAt: '12/01/2026'
+        },
+        {
+            id: '2',
+            name: 'Éco-Artisanat',
+            description: 'Artisanat fait main avec des matériaux recyclés.',
+            address: '45 avenue Verte',
+            city: 'Lyon',
+            postalCode: '69001',
+            legalStatus: 'Auto-entrepreneur',
+            email: 'artis@eco.fr',
+            phone: '04 56 78 90 12',
+            siret: '987 654 321 00045',
+            createdAt: '13/01/2026'
+        },
+    ]);
+    const [selectedShop, setSelectedShop] = useState<any>(null);
+    const [isShopModalOpen, setIsShopModalOpen] = useState(false);
 
     // Articles State
     const [articleFilter, setArticleFilter] = useState<'pending' | 'accepted' | 'refused' | 'reported'>('pending');
@@ -79,6 +111,9 @@ export default function AdminPage() {
             } else if (action?.type === 'delete') {
                 const id = action.user as string;
                 setUsers(users.filter(u => u.id !== id));
+            } else if (action?.type === 'delete_shop') {
+                const id = action.id as string;
+                setShops(shops.filter(s => s.id !== id));
             }
         }
     };
@@ -240,58 +275,69 @@ export default function AdminPage() {
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-secondary/10 pb-6">
                                         <div>
                                             <h2 className="text-2xl font-bold text-foreground">Gestion des boutiques</h2>
-                                            <p className="text-foreground/60">Supervisez l'ouverture et la validation des boutiques.</p>
+                                            <p className="text-foreground/60">Gérez et modérez les boutiques enregistrées sur la plateforme.</p>
                                         </div>
                                     </div>
 
-                                    {/* Shops Status Filter Buttons */}
-                                    <div className="flex flex-wrap gap-4">
-                                        <button
-                                            onClick={() => setShopFilter('pending')}
-                                            className={`flex-1 min-w-[150px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${shopFilter === 'pending'
-                                                ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-lg shadow-amber-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-amber-200 hover:text-amber-600'
-                                                }`}
-                                        >
-                                            <span className={`w-2 h-2 rounded-full animate-pulse ${shopFilter === 'pending' ? 'bg-amber-500' : 'bg-transparent'}`} />
-                                            Demande en attente
-                                        </button>
-                                        <button
-                                            onClick={() => setShopFilter('validated')}
-                                            className={`flex-1 min-w-[150px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${shopFilter === 'validated'
-                                                ? 'bg-green-50 border-green-500 text-green-700 shadow-lg shadow-green-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-green-200 hover:text-green-600'
-                                                }`}
-                                        >
-                                            Validés
-                                        </button>
-                                        <button
-                                            onClick={() => setShopFilter('refused')}
-                                            className={`flex-1 min-w-[150px] h-14 rounded-2xl border-2 transition-all duration-300 font-bold flex items-center justify-center gap-3 ${shopFilter === 'refused'
-                                                ? 'bg-red-50 border-red-500 text-red-700 shadow-lg shadow-red-500/10'
-                                                : 'bg-white border-secondary/10 text-foreground/40 hover:border-red-200 hover:text-red-600'
-                                                }`}
-                                        >
-                                            Refusés
-                                        </button>
-                                    </div>
-
-                                    {/* Shops List Placeholder */}
-                                    <div className="bg-secondary/2 rounded-3xl border-2 border-dashed border-secondary/20 p-20 flex flex-col items-center justify-center text-center">
-                                        <div className={`p-5 rounded-full shadow-sm mb-6 ${shopFilter === 'pending' ? 'bg-amber-100 text-amber-600' :
-                                            shopFilter === 'validated' ? 'bg-green-100 text-green-600' :
-                                                'bg-red-100 text-red-600'
-                                            }`}>
-                                            <Store className="w-10 h-10" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-foreground mb-2">
-                                            {shopFilter === 'pending' ? 'Aucune demande en attente' :
-                                                shopFilter === 'validated' ? 'Aucune boutique validée' :
-                                                    'Aucune demande refusée'}
-                                        </h3>
-                                        <p className="text-foreground/40 max-w-xs">
-                                            Les données des boutiques apparaîtront ici.
-                                        </p>
+                                    {/* Table des boutiques */}
+                                    <div className="overflow-x-auto border border-secondary/10 rounded-2xl">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead className="bg-[#F8FAFC]">
+                                                <tr>
+                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Boutique</th>
+                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Email Contact</th>
+                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10">Date Création</th>
+                                                    <th className="px-6 py-4 text-sm font-semibold text-foreground/60 border-b border-secondary/10 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-secondary/10">
+                                                {shops.map((shop) => (
+                                                    <tr key={shop.id} className="hover:bg-secondary/5 transition-colors">
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                                                                    <Store className="w-5 h-5" />
+                                                                </div>
+                                                                <span className="font-semibold text-foreground">{shop.name}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-sm text-foreground/60">{shop.email}</td>
+                                                        <td className="px-6 py-4 text-sm text-foreground/50">{shop.createdAt}</td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <div className="flex justify-end gap-2">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setSelectedShop(shop);
+                                                                        setIsShopModalOpen(true);
+                                                                    }}
+                                                                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-xl transition-all border border-transparent hover:border-primary/10"
+                                                                >
+                                                                    <Eye className="w-4 h-4" />
+                                                                    Détails
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setPendingAction({ type: 'delete_shop', id: shop.id });
+                                                                        setIsVerifying(true);
+                                                                    }}
+                                                                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                    Supprimer
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {shops.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-foreground/40 italic">
+                                                            Aucune boutique n'a été créée pour le moment.
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             )}
@@ -494,6 +540,131 @@ export default function AdminPage() {
                                 </Button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Modal Détails Boutique */}
+            {isShopModalOpen && selectedShop && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-secondary/10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh]">
+                        <div className="p-6 border-b border-secondary/10 flex items-center justify-between bg-primary/5 sticky top-0 bg-white z-10">
+                            <div className="flex items-center gap-3 text-primary">
+                                <Store className="w-6 h-6" />
+                                <h3 className="text-xl font-bold">Détails de la boutique</h3>
+                            </div>
+                            <button onClick={() => { setIsShopModalOpen(false); setSelectedShop(null); }} className="p-2 hover:bg-secondary/10 rounded-full transition-colors">
+                                <X className="w-5 h-5 text-foreground/40" />
+                            </button>
+                        </div>
+
+                        <div className="overflow-y-auto p-8 space-y-8">
+                            {/* Header Info */}
+                            <div className="flex flex-col md:flex-row gap-6 items-start">
+                                <div className="w-24 h-24 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
+                                    <Store className="w-12 h-12" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-2xl font-bold text-foreground">{selectedShop.name}</h4>
+                                    <p className="text-foreground/60 italic leading-relaxed">
+                                        "{selectedShop.description || 'Aucune description fournie.'}"
+                                    </p>
+                                    <div className="flex flex-wrap gap-2 pt-2">
+                                        {selectedShop.tags ? JSON.parse(selectedShop.tags).map((tag: string, i: number) => (
+                                            <span key={i} className="px-3 py-1 bg-secondary/10 text-foreground/60 rounded-full text-xs font-medium">
+                                                #{tag}
+                                            </span>
+                                        )) : <span className="text-xs text-foreground/40 italic">Aucun tag</span>}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Contact & Legal */}
+                                <div className="space-y-6">
+                                    <h5 className="text-sm font-bold uppercase tracking-widest text-foreground/40 flex items-center gap-2">
+                                        <Info className="w-4 h-4" />
+                                        Informations Générales
+                                    </h5>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-4 group">
+                                            <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
+                                                <Globe className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-foreground/40 font-semibold">Email Contact</p>
+                                                <p className="text-sm font-medium">{selectedShop.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4 group">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                                <Phone className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-foreground/40 font-semibold">Téléphone</p>
+                                                <p className="text-sm font-medium">{selectedShop.phone || 'Non renseigné'}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4 group">
+                                            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
+                                                <ShieldCheck className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-foreground/40 font-semibold">Statut Juridique & SIRET</p>
+                                                <p className="text-sm font-medium">{selectedShop.legalStatus || 'N/A'} - {selectedShop.siret || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Location & Social */}
+                                <div className="space-y-6">
+                                    <h5 className="text-sm font-bold uppercase tracking-widest text-foreground/40 flex items-center gap-2">
+                                        <MapPin className="w-4 h-4" />
+                                        Localisation & Réseaux
+                                    </h5>
+                                    <div className="space-y-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                                                <MapPin className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-foreground/40 font-semibold">Adresse Siège</p>
+                                                <p className="text-sm font-medium leading-tight">
+                                                    {selectedShop.address}<br />
+                                                    {selectedShop.postalCode} {selectedShop.city}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3 pt-2">
+                                            {selectedShop.instagram && (
+                                                <div className="p-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-600 hover:text-white transition-colors cursor-pointer">
+                                                    <Instagram className="w-5 h-5" />
+                                                </div>
+                                            )}
+                                            {selectedShop.facebook && (
+                                                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors cursor-pointer">
+                                                    <Facebook className="w-5 h-5" />
+                                                </div>
+                                            )}
+                                            {selectedShop.twitter && (
+                                                <div className="p-2 bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-600 hover:text-white transition-colors cursor-pointer">
+                                                    <Twitter className="w-5 h-5" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-secondary/10 bg-secondary/5 flex justify-end">
+                            <Button
+                                onClick={() => { setIsShopModalOpen(false); setSelectedShop(null); }}
+                                className="px-8 rounded-xl bg-foreground text-white hover:bg-foreground/90"
+                            >
+                                Fermer
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}
