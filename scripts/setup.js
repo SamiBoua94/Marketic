@@ -37,16 +37,27 @@ async function runCommand(command, errorMessage) {
 async function main() {
     log(colors.blue, '\n🚀 Marketic Setup\n');
 
-    // Check if .env.local exists
+    // Ensure .env/.env.local exist (idempotent for fresh clone)
     const envLocalPath = path.join(__dirname, '..', '.env.local');
-    if (!fs.existsSync(envLocalPath)) {
+    const envPath = path.join(__dirname, '..', '.env');
+    const envExamplePath = path.join(__dirname, '..', '.env.example');
+
+    if (!fs.existsSync(envLocalPath) && fs.existsSync(envExamplePath)) {
         log(colors.blue, '📝 Creating .env.local from .env.example...');
-        const envExamplePath = path.join(__dirname, '..', '.env.example');
-        if (fs.existsSync(envExamplePath)) {
-            fs.copyFileSync(envExamplePath, envLocalPath);
-            log(colors.green, '✅ .env.local created\n');
-            log(colors.yellow, '⚠️  Please update .env.local with your actual configuration\n');
-        }
+        fs.copyFileSync(envExamplePath, envLocalPath);
+        log(colors.green, '✅ .env.local created\n');
+        log(colors.yellow, '⚠️  Please update .env.local with your actual configuration\n');
+    } else if (!fs.existsSync(envLocalPath) && fs.existsSync(envPath)) {
+        log(colors.blue, '📝 Creating .env.local from existing .env...');
+        fs.copyFileSync(envPath, envLocalPath);
+        log(colors.green, '✅ .env.local created from .env\n');
+    } else if (!fs.existsSync(envLocalPath) && !fs.existsSync(envPath) && !fs.existsSync(envExamplePath)) {
+        log(colors.blue, '📝 Creating default .env and .env.local...');
+        const defaultEnv = `# Database Configuration\nDATABASE_URL=\"postgresql://marketic:secure_password@localhost:5432/marketic?schema=public\"\nDB_USER=marketic\nDB_PASSWORD=secure_password\nDB_NAME=marketic\nDB_PORT=5432\nDB_HOST=localhost\n\n# API Configuration\nAPI_URL=http://localhost:3000\nNEXTAUTH_SECRET=change-me\nNEXTAUTH_URL=http://localhost:3000\n`;
+        fs.writeFileSync(envPath, defaultEnv);
+        fs.writeFileSync(envLocalPath, defaultEnv);
+        log(colors.green, '✅ Default .env and .env.local created\n');
+        log(colors.yellow, '⚠️  Please review .env.local and update secrets before deploying to production\n');
     } else {
         log(colors.green, '✅ .env.local already exists\n');
     }
@@ -67,18 +78,53 @@ async function main() {
     } else {
         log(colors.green, '✅ Docker found\n');
         
-        log(colors.blue, '🐘 Starting PostgreSQL...');
+            log(colors.blue, '🐘 Starting PostgreSQL...');
+
+        // Remove conflicting container if exists (idempotent start)
+        try {
+            const { stdout: existing } = await execAsync('docker ps -a --filter "name=marketic-postgres" --format "{{.ID}}"');
+            if (existing && existing.trim()) {
+                log(colors.yellow, `⚠️  Found existing container 'marketic-postgres' (id: ${existing.trim()}). Removing to avoid conflict...`);
+                await execAsync(`docker rm -f marketic-postgres`);
+                log(colors.green, `✅ Removed existing container 'marketic-postgres'`);
+            }
+        } catch (err) {
+            // ignore — if docker is not installed we'll detect it below
+        }
+
         if (await runCommand('docker-compose -f docker-compose.postgresql.yml up -d', 'Failed to start PostgreSQL')) {
             log(colors.green, '✅ PostgreSQL started\n');
-            log(colors.blue, '⏳ Waiting for PostgreSQL to be ready (10 seconds)...');
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            
+
+            // Wait until PostgreSQL is ready using pg_isready inside the container
+            log(colors.blue, '⏳ Waiting for PostgreSQL to be ready...');
+            let ready = false;
+            for (let i = 0; i < 30; i++) {
+                try {
+                    const { stdout } = await execAsync('docker exec marketic-postgres pg_isready -U marketic');
+                    if (stdout && stdout.includes('accepting connections')) {
+                        ready = true;
+                        break;
+                    }
+                } catch (e) {
+                    // ignore and retry
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            if (!ready) {
+                log(colors.yellow, '⚠️  PostgreSQL did not become ready in time; continuing but DB commands may fail');
+            } else {
+                log(colors.green, '✅ PostgreSQL is ready');
+            }
+
             log(colors.blue, '🔄 Running database setup...');
-            if (await runCommand('npx prisma db push --skip-generate', 'Failed to push database schema')) {
+            if (await runCommand('npx prisma db push', 'Failed to push database schema')) {
                 log(colors.green, '✅ Database schema synced\n');
-                
+
+                // Generate client
+                await runCommand('npx prisma generate', 'Failed to generate Prisma client');
+
                 log(colors.blue, '🌱 Seeding database with test data...');
-                if (await runCommand('npx ts-node prisma/seeds/main.seed.ts', 'Failed to seed database')) {
+                if (await runCommand('npx ts-node-esm prisma/seeds/main.seed.ts', 'Failed to seed database')) {
                     log(colors.green, '✅ Database seeded\n');
                 } else {
                     log(colors.yellow, '⚠️  Failed to seed database. You can run it manually with: npm run db:seed\n');
