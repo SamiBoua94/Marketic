@@ -4,6 +4,7 @@ export interface MockProduct {
     description: string;
     price: number;
     image: string;
+    category: string;
     shop: {
         name: string;
         logo: string;
@@ -17,6 +18,7 @@ export const mockProducts: MockProduct[] = [
         description: 'Un vase artisanal fabriqué à la main avec de l\'argile locale et une glaçure minérale unique.',
         price: 45.00,
         image: 'https://images.unsplash.com/photo-1578749553846-bc3a6c9a4421?auto=format&fit=crop&q=80&w=400',
+        category: 'Décoration',
         shop: {
             name: 'Atelier de la Terre',
             logo: 'https://images.unsplash.com/photo-1541944743827-e04bb645f9ad?auto=format&fit=crop&q=80&w=100'
@@ -28,6 +30,7 @@ export const mockProducts: MockProduct[] = [
         description: 'Tissage traditionnel en laine de mouton élevée en plein air, sans colorants chimiques.',
         price: 32.50,
         image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?auto=format&fit=crop&q=80&w=400',
+        category: 'Mode',
         shop: {
             name: 'Tissage & Co',
             logo: 'https://images.unsplash.com/photo-1621237023020-f57f5c9428b4?auto=format&fit=crop&q=80&w=100'
@@ -39,6 +42,7 @@ export const mockProducts: MockProduct[] = [
         description: 'Fabriquée à partir de chêne massif recyclé, chaque table possède un grain unique.',
         price: 120.00,
         image: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&q=80&w=400',
+        category: 'Mobilier',
         shop: {
             name: 'Le Coin du Bois',
             logo: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=100'
@@ -50,6 +54,7 @@ export const mockProducts: MockProduct[] = [
         description: 'Saponification à froid avec des huiles essentielles bio de Provence.',
         price: 8.50,
         image: 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&q=80&w=400',
+        category: 'Soin & Beauté',
         shop: {
             name: 'Bullles & Nature',
             logo: 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&q=80&w=100'
@@ -61,9 +66,46 @@ export const mockProducts: MockProduct[] = [
         description: 'Panier robuste idéal pour le marché, tressé à la main par des vanneries locales.',
         price: 25.00,
         image: 'https://images.unsplash.com/photo-1590736704728-f4730bb3c570?auto=format&fit=crop&q=80&w=400',
+        category: 'Accessoires',
         shop: {
             name: 'Vannerie d\'Antan',
             logo: 'https://images.unsplash.com/photo-1590736704728-f4730bb3c570?auto=format&fit=crop&q=80&w=100'
+        }
+    },
+    {
+        id: '6',
+        name: 'Bougie Cire d\'Abeille',
+        description: 'Bougie naturelle coulée à la main, parfumée aux huiles essentielles de pin.',
+        price: 18.00,
+        image: 'https://images.unsplash.com/photo-1603006899172-64291ee52e74?auto=format&fit=crop&q=80&w=400',
+        category: 'Décoration',
+        shop: {
+            name: 'Lueur Naturelle',
+            logo: 'https://images.unsplash.com/photo-1603006899172-64291ee52e74?auto=format&fit=crop&q=80&w=100'
+        }
+    },
+    {
+        id: '7',
+        name: 'Coussin en Lin Lavé',
+        description: 'Housse de coussin en lin naturel, teinté avec des pigments végétaux.',
+        price: 35.00,
+        image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&q=80&w=400',
+        category: 'Décoration',
+        shop: {
+            name: 'Tissage & Co',
+            logo: 'https://images.unsplash.com/photo-1621237023020-f57f5c9428b4?auto=format&fit=crop&q=80&w=100'
+        }
+    },
+    {
+        id: '8',
+        name: 'Huile de Visage Éclat',
+        description: 'Mélange d\'huiles précieuses bio pour nourrir et illuminer le teint.',
+        price: 28.00,
+        image: 'https://images.unsplash.com/photo-1608248597279-f99d160bfdba?auto=format&fit=crop&q=80&w=400',
+        category: 'Soin & Beauté',
+        shop: {
+            name: 'Bullles & Nature',
+            logo: 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&q=80&w=100'
         }
     }
 ];

@@ -24,9 +24,9 @@ export const cartService = {
     try {
       let cart = await prisma.cart.findUnique({
         where: { userId },
-        include: { 
-          items: { 
-            include: { 
+        include: {
+          items: {
+            include: {
               product: {
                 select: {
                   id: true,
@@ -34,32 +34,33 @@ export const cartService = {
                   price: true,
                   // Ajoutez d'autres champs de produit nécessaires
                 }
-              } 
-            } 
-          } 
+              }
+            }
+          }
         }
       });
 
       if (!cart) {
         cart = await prisma.cart.create({
-          data: { 
+          data: {
             userId,
             items: {
               create: []
             }
           },
-          include: { 
-            items: { 
-              include: { 
+          include: {
+            items: {
+              include: {
                 product: {
                   select: {
                     id: true,
                     name: true,
                     price: true,
+                    images: true,
                   }
-                } 
-              } 
-            } 
+                }
+              }
+            }
           }
         });
       }
@@ -80,22 +81,22 @@ export const cartService = {
       if (existingItem) {
         const updatedItem = await prisma.cartItem.update({
           where: { id: existingItem.id },
-          data: { 
+          data: {
             quantity: {
               increment: quantity
-            } 
+            }
           },
-          include: { 
+          include: {
             product: {
               select: {
                 id: true,
                 name: true,
                 price: true,
               }
-            } 
+            }
           }
         });
-        
+
         return updatedItem as CartItemWithProduct;
       }
 
@@ -105,14 +106,14 @@ export const cartService = {
           productId,
           quantity
         },
-        include: { 
+        include: {
           product: {
             select: {
               id: true,
               name: true,
               price: true,
             }
-          } 
+          }
         }
       });
 
@@ -132,14 +133,14 @@ export const cartService = {
       const updatedItem = await prisma.cartItem.update({
         where: { id: cartItemId },
         data: { quantity },
-        include: { 
+        include: {
           product: {
             select: {
               id: true,
               name: true,
               price: true,
             }
-          } 
+          }
         }
       });
 
