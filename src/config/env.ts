@@ -6,7 +6,7 @@ const requiredEnvVars = [
 
 export const env = {
     // Database
-    DATABASE_URL: process.env.DATABASE_URL,
+    DATABASE_URL: process.env.DATABASE_URL || "postgresql://postgres.gjvbiizzkvdsqoqlyjus:matketic1234.@aws-1-eu-west-1.pooler.supabase.com:5432/postgres",
 
     // Authentication
     JWT_SECRET: process.env.JWT_SECRET || 'dev-secret',
