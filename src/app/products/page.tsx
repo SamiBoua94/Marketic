@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, SlidersHorizontal, PackageSearch, X, LayoutGrid, List } from 'lucide-react';
-import { mockProducts } from '@/lib/mock-data';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, Filter, SlidersHorizontal, PackageSearch, X, LayoutGrid, List, Loader2 } from 'lucide-react';
 import { ProductSearchCard } from '@/components/search/ProductSearchCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { MockProduct } from '@/lib/mock-data';
 
 const CATEGORIES = [
     'Tous',
@@ -13,22 +13,51 @@ const CATEGORIES = [
     'Mode',
     'Mobilier',
     'Soin & Beauté',
-    'Accessoires'
+    'Accessoires',
+    'Fashion',
+    'Home & Garden'
 ];
 
 export default function ProductsPage() {
+    const [products, setProducts] = useState<MockProduct[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Tous');
     const [isFilterVisible, setIsFilterVisible] = useState(false);
 
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setIsLoading(true);
+                const response = await fetch('/api/products/catalog');
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des produits');
+                }
+                const data = await response.json();
+                setProducts(data.products || []);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+
     const filteredProducts = useMemo(() => {
-        return mockProducts.filter(product => {
+        return products.filter(product => {
             const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 product.description.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesCategory = selectedCategory === 'Tous' || product.category === selectedCategory;
+
+            // Allow matching "Fashion" and "Mode", etc. if categories differ between DB and display
+            const normalizedCategory = selectedCategory === 'Tous' ? 'Tous' : selectedCategory;
+            const matchesCategory = normalizedCategory === 'Tous' || product.category === selectedCategory;
+
             return matchesSearch && matchesCategory;
         });
-    }, [searchQuery, selectedCategory]);
+    }, [products, searchQuery, selectedCategory]);
 
     return (
         <div className="min-h-screen bg-background">
@@ -92,8 +121,8 @@ export default function ProductsPage() {
                                             key={category}
                                             onClick={() => setSelectedCategory(category)}
                                             className={`text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${selectedCategory === category
-                                                    ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                                    : 'bg-secondary/5 text-foreground/70 hover:bg-secondary/10'
+                                                ? 'bg-primary text-white shadow-md shadow-primary/20'
+                                                : 'bg-secondary/5 text-foreground/70 hover:bg-secondary/10'
                                                 }`}
                                         >
                                             {category}
@@ -134,7 +163,25 @@ export default function ProductsPage() {
                         </div>
 
                         {/* Products Grid */}
-                        {filteredProducts.length > 0 ? (
+                        {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-24 gap-4">
+                                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                                <p className="text-foreground/50 animate-pulse font-medium">Chargement des produits...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="py-24 text-center bg-destructive/5 rounded-3xl border border-dashed border-destructive/20">
+                                <h2 className="text-2xl font-heading font-bold text-destructive mb-2">Erreur</h2>
+                                <p className="text-foreground/50 max-w-sm mx-auto mb-6">
+                                    {error}
+                                </p>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => window.location.reload()}
+                                >
+                                    Réessayer
+                                </Button>
+                            </div>
+                        ) : filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {filteredProducts.map((product) => (
                                     <div key={product.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
