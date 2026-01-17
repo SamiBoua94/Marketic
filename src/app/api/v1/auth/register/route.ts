@@ -12,7 +12,11 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         // Validate input
-        const validated = await validate(createUserSchema, body);
+        const validated = await validate(createUserSchema, body) as {
+            email: string;
+            password: string;
+            name: string;
+        };
 
         // Register user through service
         const user = await authService.register(

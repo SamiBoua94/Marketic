@@ -1,29 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Version simplifiée pour la compatibilité avec Next.js 14
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: any
 ) {
+  const shopId = params?.id;
+  
+  if (!shopId) {
+    return NextResponse.json(
+      { error: 'ID de boutique manquant' },
+      { status: 400 }
+    );
+  }
   try {
-    // Extraire l'ID directement de l'URL
-    const url = new URL(request.url || '', `http://${request.headers.get('host')}`);
-    const pathSegments = url.pathname.split('/');
-    const shopId = pathSegments[pathSegments.length - 1];
-    
-    console.log('URL complète:', request.url);
-    console.log('Segments du chemin:', pathSegments);
-    console.log('ID extrait:', shopId);
-    
-    // Vérifier que l'ID est bien défini
-    if (!shopId) {
-      console.error('Erreur: Aucun ID de boutique fourni');
-      return NextResponse.json(
-        { error: 'ID de boutique manquant', receivedParams: params },
-        { status: 400 }
-      );
-    }
-    
+    // Journalisation pour le débogage
     console.log('Recherche de la boutique avec ID:', shopId);
     console.log('Type de shopId:', typeof shopId);
 
@@ -43,10 +35,8 @@ export async function GET(
         email: true,
         instagram: true,
         facebook: true,
-        twitter: true
-        // Note: Ces champs devront être ajoutés à votre schéma Prisma si ce n'est pas déjà fait
-        // rating: true,
-        // tags: true
+        twitter: true,
+        // Ajoutez d'autres champs nécessaires
       },
     });
 
