@@ -1,204 +1,230 @@
 "use client";
 
-import Link from 'next/link';
-import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/auth-context';
-import { useCart } from '@/context/cart-context';
-import { useState, useRef, useEffect } from 'react';
+import Link from "next/link";
+import {
+  ShoppingBag,
+  Search,
+  Menu,
+  Leaf,
+  User,
+  LogOut,
+  ChevronDown,
+  Store,
+  Package,
+  Headphones,
+  MessageSquare,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/auth-context";
+import { useCart } from "@/context/cart-context";
+import { useState, useRef, useEffect } from "react";
 
 export function Header() {
-    const { user, loading, logout } = useAuth();
-    const { totalItems } = useCart();
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, loading, logout } = useAuth();
+  const { totalItems } = useCart();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Communicate search query to the window for simple page integration
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const event = new CustomEvent('app-search', { detail: searchQuery });
-            window.dispatchEvent(event);
-        }
-    }, [searchQuery]);
+  // Communicate search query to the window for simple page integration
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("app-search", { detail: searchQuery });
+      window.dispatchEvent(event);
+    }
+  }, [searchQuery]);
 
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setDropdownOpen(false);
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleLogout = async () => {
-        await logout();
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
-    };
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    return (
-        <header className="sticky top-0 z-50 w-full border-b border-secondary/20 bg-background/80 backdrop-blur-md">
-            <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                        <Leaf className="w-6 h-6 text-primary" />
-                    </div>
-                    <span className="font-heading font-bold text-xl tracking-tight text-foreground">
-                        Markethic
-                    </span>
-                </Link>
+  const handleLogout = async () => {
+    await logout();
+    setDropdownOpen(false);
+  };
 
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
-                        Notre Mission
-                    </Link>
-                    <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
-                        Catalogue
-                    </Link>
-                    <Link href="/services" className="text-sm font-medium hover:text-primary transition-colors">
-                        Services
-                    </Link>
-                    <Link href="/boutiques" className="text-sm font-medium hover:text-primary transition-colors">
-                        Boutiques
-                    </Link>
-                    <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
-                        Demander à l'IA
-                    </Link>
-                </nav>
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-secondary/20 bg-background/80 backdrop-blur-md">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
+            <Leaf className="w-6 h-6 text-primary" />
+          </div>
+          <span className="font-heading font-bold text-xl tracking-tight text-foreground">
+            Markethic
+          </span>
+        </Link>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                    <div className={`relative flex items-center transition-all duration-300 ease-in-out ${isSearchOpen ? 'w-48 sm:w-64' : 'w-10'}`}>
-                        <button
-                            onClick={() => {
-                                if (isSearchOpen) setSearchQuery('');
-                                setIsSearchOpen(!isSearchOpen);
-                            }}
-                            className={`p-2 rounded-full hover:bg-secondary/10 transition-colors z-10 ${isSearchOpen ? 'text-primary' : 'text-foreground/70'}`}
-                        >
-                            <Search className="w-5 h-5" />
-                            <span className="sr-only">Rechercher</span>
-                        </button>
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Rechercher un produit..."
-                            className={`absolute left-0 pl-10 pr-4 py-2 w-full bg-secondary/5 border border-secondary/20 rounded-full text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${isSearchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
-                        />
-                    </div>
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          <Link
+            href="/boutiques"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Boutiques
+          </Link>
+          <Link
+            href="/services"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Services
+          </Link>
+          <Link
+            href="/about"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Notre Mission
+          </Link>
+        </nav>
 
-                    <Link href="/cart">
-                        <Button variant="ghost" size="sm" className="relative">
-                            <ShoppingBag className="w-5 h-5" />
-                            {totalItems > 0 && (
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
-                                    {totalItems}
-                                </span>
-                            )}
-                            <span className="sr-only">Panier</span>
-                        </Button>
-                    </Link>
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <div
+            className={`relative flex items-center transition-all duration-300 ease-in-out ${isSearchOpen ? "w-48 sm:w-64" : "w-10"}`}
+          >
+            <button
+              onClick={() => {
+                if (isSearchOpen) setSearchQuery("");
+                setIsSearchOpen(!isSearchOpen);
+              }}
+              className={`p-2 rounded-full hover:bg-secondary/10 transition-colors z-10 ${isSearchOpen ? "text-primary" : "text-foreground/70"}`}
+            >
+              <Search className="w-5 h-5" />
+              <span className="sr-only">Rechercher</span>
+            </button>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher un produit..."
+              className={`absolute left-0 pl-10 pr-4 py-2 w-full bg-secondary/5 border border-secondary/20 rounded-full text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${isSearchOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+            />
+          </div>
 
-                    {loading ? (
-                        <div className="w-10 h-10 rounded-full bg-secondary/20 animate-pulse" />
-                    ) : user ? (
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="flex items-center gap-2 p-1 rounded-full hover:bg-secondary/10 transition-colors"
-                            >
-                                {user.profilePicture ? (
-                                    <img
-                                        src={user.profilePicture}
-                                        alt={user.name}
-                                        className="w-9 h-9 rounded-full object-cover border-2 border-primary/30"
-                                    />
-                                ) : (
-                                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/30">
-                                        <User className="w-5 h-5 text-primary" />
-                                    </div>
-                                )}
-                                <ChevronDown className={`w-4 h-4 text-foreground/60 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
+          <Link href="/cart">
+            <Button variant="ghost" size="sm" className="relative">
+              <ShoppingBag className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+                  {totalItems}
+                </span>
+              )}
+              <span className="sr-only">Panier</span>
+            </Button>
+          </Link>
 
-                            {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-secondary/20 py-2 z-50">
-                                    <div className="px-4 py-2 border-b border-secondary/10">
-                                        <p className="font-medium text-foreground">{user.name}</p>
-                                        <p className="text-sm text-foreground/60">{user.email}</p>
-                                    </div>
-                                    <Link
-                                        href="/profile"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                    >
-                                        <User className="w-4 h-4" />
-                                        Mon Profil
-                                    </Link>
-                                    <Link
-                                        href="/messages"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                    >
-                                        <MessageSquare className="w-4 h-4" />
-                                        Messagerie
-                                    </Link>
-                                    <Link
-                                        href="/shop"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                    >
-                                        <Store className="w-4 h-4" />
-                                        {user.hasShop ? "Gérer ma boutique" : "Ouvrir ma boutique"}
-                                    </Link>
-                                    {user.hasShop && (
-                                        <>
-                                            <Link
-                                                href="/orders"
-                                                onClick={() => setDropdownOpen(false)}
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                            >
-                                                <Package className="w-4 h-4" />
-                                                Commande
-                                            </Link>
-                                            <Link
-                                                href="/support"
-                                                onClick={() => setDropdownOpen(false)}
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                            >
-                                                <Headphones className="w-4 h-4" />
-                                                Support
-                                            </Link>
-                                        </>
-                                    )}
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                        Se déconnecter
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <Link href="/login">
-                            <Button variant="primary" size="sm" className="hidden md:inline-flex">
-                                Connexion
-                            </Button>
-                        </Link>
-                    )}
+          {loading ? (
+            <div className="w-10 h-10 rounded-full bg-secondary/20 animate-pulse" />
+          ) : user ? (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 p-1 rounded-full hover:bg-secondary/10 transition-colors"
+              >
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user.name}
+                    className="w-9 h-9 rounded-full object-cover border-2 border-primary/30"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/30">
+                    <User className="w-5 h-5 text-primary" />
+                  </div>
+                )}
+                <ChevronDown
+                  className={`w-4 h-4 text-foreground/60 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
 
-                    <Button variant="ghost" size="sm" className="md:hidden">
-                        <Menu className="w-5 h-5" />
-                    </Button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-secondary/20 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-secondary/10">
+                    <p className="font-medium text-foreground">{user.name}</p>
+                    <p className="text-sm text-foreground/60">{user.email}</p>
+                  </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    Mon Profil
+                  </Link>
+                  <Link
+                    href="/messages"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Messagerie
+                  </Link>
+                  <Link
+                    href="/shop"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                  >
+                    <Store className="w-4 h-4" />
+                    {user.hasShop ? "Gérer ma boutique" : "Ouvrir ma boutique"}
+                  </Link>
+                  {user.hasShop && (
+                    <>
+                      <Link
+                        href="/orders"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                      >
+                        <Package className="w-4 h-4" />
+                        Commande
+                      </Link>
+                      <Link
+                        href="/support"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                      >
+                        <Headphones className="w-4 h-4" />
+                        Support
+                      </Link>
+                    </>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Se déconnecter
+                  </button>
                 </div>
+              )}
             </div>
-        </header>
-    );
+          ) : (
+            <Link href="/login">
+              <Button
+                variant="primary"
+                size="sm"
+                className="hidden md:inline-flex"
+              >
+                Connexion
+              </Button>
+            </Link>
+          )}
+
+          <Button variant="ghost" size="sm" className="md:hidden">
+            <Menu className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
 }
