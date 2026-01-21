@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": "2",
+      "name": "Écharpe en Laine Bio",
+      "price": 32.5,
+      "addedAt": "2026-01-21T21:59:01.816Z"
+    },
+    {
+      "id": "4",
+      "name": "Savon Artisanal Lavande",
+      "price": 8.5,
+      "addedAt": "2026-01-21T22:00:45.864Z"
+    },
+    {
+      "id": "8",
+      "name": "Huile de Visage Éclat",
+      "price": 28,
+      "addedAt": "2026-01-21T22:01:34.531Z"
+    },
+    {
+      "id": "2",
+      "name": "Écharpe en Laine Bio",
+      "price": 32.5,
+      "addedAt": "2026-01-21T22:04:17.134Z"
+    }
+  ]
+}

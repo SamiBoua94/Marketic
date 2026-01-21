@@ -1,6 +1,8 @@
 import { Award, Store } from 'lucide-react';
 import { MockProduct } from '@/lib/mock-data';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
+import { addToCartLocal } from '@/app/api/addToCartLocal';
+
 
 export function ProductSearchCard({ product }: { product: MockProduct }) {
     return (
@@ -36,7 +38,11 @@ export function ProductSearchCard({ product }: { product: MockProduct }) {
                 </div>
 
                 <div className="mt-auto">
-                    <AddToCartButton productId={product.id} className="w-full" />
+                    <AddToCartButton
+                        productId={product.id}
+                        className="w-full"
+                        onClick={addToCartLocal.bind(null, product.id)}
+                    />
                 </div>
             </div>
         </div>

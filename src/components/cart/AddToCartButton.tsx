@@ -12,6 +12,7 @@ interface AddToCartButtonProps {
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'accent';
     size?: 'sm' | 'md' | 'lg';
     showText?: boolean;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export function AddToCartButton({
@@ -19,19 +20,24 @@ export function AddToCartButton({
     className,
     variant = 'primary',
     size = 'md',
-    showText = true
+    showText = true,
+    onClick
 }: AddToCartButtonProps) {
     const { addItem } = useCart();
     const [isAdding, setIsAdding] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const handleAdd = async (e: React.MouseEvent) => {
+    const handleAdd = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
+        if (onClick) {
+            onClick(e);
+        }
+
         setIsAdding(true);
         try {
-            await addItem(productId, 1);
+            // await addItem(productId, 1);
             setIsSuccess(true);
             setTimeout(() => setIsSuccess(false), 2000);
         } catch (error) {

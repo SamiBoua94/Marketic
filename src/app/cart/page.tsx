@@ -9,10 +9,35 @@ import { useAuth } from '@/context/auth-context';
 import { Badge } from '@/components/ui/badge';
 
 export default function CartPage() {
-    const { items, removeItem, updateQuantity, totalPrice, totalItems, isLoading } = useCart();
+    const { items: contextItems, removeItem, updateQuantity, totalPrice: contextTotalPrice, totalItems: contextTotalItems, isLoading } = useCart();
     const { user } = useAuth();
 
-    if (!user) {
+    // Local state for file-based cart
+    const [localItems, setLocalItems] = React.useState<any[]>([]);
+    const [isLocalLoading, setIsLocalLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        // Fetch local cart items
+        import('@/app/api/addToCartLocal').then(mod => {
+            mod.getCartLocal().then(items => {
+                setLocalItems(items);
+                setIsLocalLoading(false);
+            });
+        });
+    }, []);
+
+    // Combine or override items
+    // For this task, we prioritize valid localItems if they exist suitable for the prompt, 
+    // but the prompt implies this IS the cart now. 
+    // To make it seamless with existing UI which uses 'items', we'll use localItems if populated.
+    // However, existing UI relies on 'items' from useCart. 
+    // Let's create a derivative 'displayItems'
+
+    const items = localItems.length > 0 ? localItems : contextItems;
+    const totalItems = localItems.length > 0 ? items.reduce((acc, item) => acc + item.quantity, 0) : contextTotalItems;
+    const totalPrice = localItems.length > 0 ? items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0) : contextTotalPrice;
+
+    if (!user && localItems.length === 0) { // Only show login prompt if no local items either
         return (
             <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
                 <div className="p-6 bg-secondary/10 rounded-full mb-6">
@@ -29,7 +54,7 @@ export default function CartPage() {
         );
     }
 
-    if (items.length === 0 && !isLoading) {
+    if (items.length === 0 && !isLoading && !isLocalLoading) {
         return (
             <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
                 <div className="p-6 bg-secondary/10 rounded-full mb-6">
