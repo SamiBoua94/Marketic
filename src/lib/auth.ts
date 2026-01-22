@@ -2,9 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import NextAuth, { type NextAuthOptions } from 'next-auth';
-import { PrismaAdapter } from '@auth/prisma-adapter';
-import { prisma } from './prisma';
+import { authOptions } from './auth-options';
 
 // Configuration JWT
 const secret = new TextEncoder().encode(
@@ -30,42 +28,7 @@ declare module 'next-auth' {
   }
 }
 
-// Configuration NextAuth
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: 'jwt',
-  },
-  providers: [
-    // Ajoutez vos fournisseurs ici (Google, GitHub, etc.)
-  ],
-  callbacks: {
-    async session({ session, token }) {
-      if (token?.sub) {
-        session.user = {
-          ...session.user,
-          id: token.sub
-        };
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id;
-      }
-      return token;
-    },
-  },
-  pages: {
-    signIn: '/auth/signin',
-  },
-  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key',
-  debug: process.env.NODE_ENV === 'development',
-};
-
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export { authOptions };
 
 // Fonctions JWT
 export async function createToken(payload: UserPayload): Promise<string> {
@@ -93,12 +56,17 @@ export async function verifyToken(token: string): Promise<UserPayload | null> {
 // Fonction utilitaire pour obtenir l'utilisateur courant (côté serveur)
 export async function getCurrentUser(): Promise<UserPayload | null> {
   try {
-    // Dans les Server Components, utilisez getServerSession
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.id) {
+      console.log('Aucune session utilisateur trouvée');
       return null;
     }
+
+    console.log('Session trouvée:', {
+      userId: session.user.id,
+      email: session.user.email
+    });
     
     return {
       id: session.user.id,
@@ -113,7 +81,23 @@ export async function getCurrentUser(): Promise<UserPayload | null> {
 
 // Fonction utilitaire pour obtenir la session utilisateur (côté serveur)
 export async function getSession(): Promise<UserPayload | null> {
-  return getCurrentUser();
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      console.log('getSession: Aucun ID utilisateur trouvé dans la session');
+      return null;
+    }
+
+    return {
+      id: session.user.id,
+      email: session.user.email || '',
+      name: session.user.name || ''
+    };
+  } catch (error) {
+    console.error('Erreur dans getSession:', error);
+    return null;
+  }
 }
 
 // Fonction utilitaire pour définir un cookie d'authentification

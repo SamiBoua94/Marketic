@@ -124,14 +124,40 @@ export const cartService = {
     }
   },
 
-  async updateCartItem(cartItemId: string, quantity: number): Promise<CartItemWithProduct | void> {
+  async updateCartItem(cartItemId: string, quantity: number, userId: string): Promise<CartItemWithProduct> {
     try {
+      // Vérifier que l'élément appartient bien à l'utilisateur
+      const cartItem = await prisma.cartItem.findFirst({
+        where: { 
+          id: cartItemId,
+          cart: { userId }
+        },
+        include: {
+          cart: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+            }
+          }
+        }
+      });
+
+      if (!cartItem) {
+        throw new Error('Article non trouvé dans votre panier');
+      }
+
       if (quantity <= 0) {
-        return this.removeFromCart(cartItemId);
+        await this.removeFromCart(cartItemId, userId);
+        throw new Error('La quantité doit être supérieure à zéro');
       }
 
       const updatedItem = await prisma.cartItem.update({
-        where: { id: cartItemId },
+        where: { 
+          id: cartItemId,
+          cart: { userId } // Double vérification de sécurité
+        },
         data: { quantity },
         include: {
           product: {
@@ -146,19 +172,34 @@ export const cartService = {
 
       return updatedItem as CartItemWithProduct;
     } catch (error) {
-      console.error('Error in updateCartItem:', error);
-      throw new Error('Failed to update cart item');
+      console.error('Erreur lors de la mise à jour du panier:', error);
+      throw new Error(error instanceof Error ? error.message : 'Échec de la mise à jour du panier');
     }
   },
 
-  async removeFromCart(cartItemId: string): Promise<void> {
+  async removeFromCart(cartItemId: string, userId: string): Promise<void> {
     try {
+      // Vérifier que l'élément appartient bien à l'utilisateur avant suppression
+      const cartItem = await prisma.cartItem.findFirst({
+        where: { 
+          id: cartItemId,
+          cart: { userId }
+        }
+      });
+
+      if (!cartItem) {
+        throw new Error('Article non trouvé dans votre panier');
+      }
+
       await prisma.cartItem.delete({
-        where: { id: cartItemId }
+        where: { 
+          id: cartItemId,
+          cart: { userId } // Double vérification de sécurité
+        }
       });
     } catch (error) {
-      console.error('Error in removeFromCart:', error);
-      throw new Error('Failed to remove item from cart');
+      console.error('Erreur lors de la suppression de l\'article:', error);
+      throw new Error(error instanceof Error ? error.message : 'Échec de la suppression de l\'article');
     }
   },
 
