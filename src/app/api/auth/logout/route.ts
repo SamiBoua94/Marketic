@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
-import { clearAuthCookie } from '@/lib/auth';
 
 export async function POST() {
-    await clearAuthCookie();
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+        {
+            error: "Cette route n'est plus utilisée. Utilise NextAuth via signOut() sur /api/auth/[...nextauth].",
+        },
+        { status: 410 }
+    );
 }

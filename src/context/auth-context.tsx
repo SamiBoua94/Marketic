@@ -151,10 +151,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const updateProfile = async (data: Partial<User>) => {
         try {
-            const response = await fetch('/api/profile', {
+            const response = await fetch('/api/profile/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -168,8 +169,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const updatedUser = await response.json();
             setUser(prev => ({
                 ...prev!,
-                ...updatedUser,
-                profilePicture: updatedUser.profilePicture || prev?.profilePicture || null,
+                ...(updatedUser?.user || {}),
+                profilePicture: updatedUser?.user?.profilePicture || prev?.profilePicture || null,
             }));
 
             return { success: true };

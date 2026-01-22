@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { createToken, setAuthCookie } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
     try {
@@ -37,14 +36,6 @@ export async function POST(request: NextRequest) {
                 name,
             }
         });
-
-        // Create token and set cookie
-        const token = await createToken({
-            id: user.id,
-            email: user.email,
-            name: user.name,
-        });
-        await setAuthCookie(token);
 
         return NextResponse.json({
             user: {
