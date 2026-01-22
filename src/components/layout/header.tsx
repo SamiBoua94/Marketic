@@ -1,25 +1,35 @@
 "use client";
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { useState, useRef, useEffect } from 'react';
 
 export function Header() {
+    const router = useRouter();
     const { user, loading, logout } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
-    // Communicate search query to the window for simple page integration
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const event = new CustomEvent('app-search', { detail: searchQuery });
-            window.dispatchEvent(event);
+    // Handle search submission - navigate to search page
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            router.push(`/recherche?q=${encodeURIComponent(searchQuery.trim())}`);
+            setIsSearchOpen(false);
+            setSearchQuery('');
         }
-    }, [searchQuery]);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -30,6 +40,13 @@ export function Header() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Focus search input when opened
+    useEffect(() => {
+        if (isSearchOpen && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [isSearchOpen]);
 
     const handleLogout = async () => {
         await logout();
@@ -76,10 +93,12 @@ export function Header() {
                             <span className="sr-only">Rechercher</span>
                         </button>
                         <input
+                            ref={searchInputRef}
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Rechercher un produit..."
+                            onKeyDown={handleKeyDown}
+                            placeholder="Rechercher boutiques, produits..."
                             className={`absolute left-0 pl-10 pr-4 py-2 w-full bg-secondary/5 border border-secondary/20 rounded-full text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300 ${isSearchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
                         />
                     </div>

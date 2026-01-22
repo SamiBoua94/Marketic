@@ -1,45 +1,98 @@
-import { mockProducts } from '@/lib/mock-data';
-import { ProductSearchCard } from './ProductSearchCard';
-import { SearchX } from 'lucide-react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { ShopSearchCard } from './ShopSearchCard';
+import { SearchX, Loader2, Store } from 'lucide-react';
+
+interface Shop {
+    id: string;
+    name: string;
+    description?: string | null;
+    city?: string | null;
+    profilePicture?: string | null;
+    tags?: string | null;
+    products?: { id: string }[];
+}
 
 interface SearchResultsProps {
     query: string;
 }
 
 export function SearchResults({ query }: SearchResultsProps) {
-    const filteredProducts = mockProducts.filter(p =>
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase()) ||
-        p.shop.name.toLowerCase().includes(query.toLowerCase())
-    );
+    const [shops, setShops] = useState<Shop[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [searched, setSearched] = useState(false);
 
-    const hasResults = filteredProducts.length > 0;
-    const itemsToDisplay = hasResults ? filteredProducts : mockProducts.slice(0, 3);
+    useEffect(() => {
+        if (!query.trim()) {
+            setShops([]);
+            setSearched(false);
+            return;
+        }
+
+        const searchShops = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(`/api/shops?search=${encodeURIComponent(query)}`);
+                if (res.ok) {
+                    const response = await res.json();
+                    // API returns { success: true, data: [...] }
+                    setShops(response.data || response || []);
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+            } finally {
+                setLoading(false);
+                setSearched(true);
+            }
+        };
+
+        // Debounce search
+        const timeout = setTimeout(searchShops, 300);
+        return () => clearTimeout(timeout);
+    }, [query]);
+
+    if (!query) return null;
+
+    if (loading) {
+        return (
+            <div className="container mx-auto px-4 py-16">
+                <div className="flex flex-col items-center justify-center text-zinc-500">
+                    <Loader2 className="w-10 h-10 animate-spin mb-4" />
+                    <p>Recherche en cours...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const hasResults = shops.length > 0;
 
     return (
         <div className="container mx-auto px-4 py-12">
-            {!hasResults && query && (
+            {!hasResults && searched && (
                 <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4">
                     <div className="inline-flex p-4 bg-zinc-100 dark:bg-zinc-800 rounded-full mb-6 text-zinc-400">
                         <SearchX size={48} />
                     </div>
-                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Rien trouvé</h2>
+                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Aucune boutique trouvée</h2>
                     <p className="text-zinc-500 max-w-md mx-auto">
-                        Nous n'avons trouvé aucun résultat pour "{query}". Voici quelques créations d'autres artisans qui pourraient vous plaire.
+                        Nous n'avons trouvé aucune boutique pour "{query}". Essayez un autre terme de recherche.
                     </p>
                 </div>
             )}
 
-            {query && (
+            {hasResults && (
                 <div className="animate-in fade-in duration-500">
-                    {hasResults && (
-                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-8">
-                            Résultats pour "{query}"
+                    <div className="flex items-center gap-3 mb-8">
+                        <Store className="w-6 h-6 text-emerald-600" />
+                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                            Boutiques pour "{query}"
                         </h2>
-                    )}
+                        <span className="text-sm text-zinc-500">({shops.length} résultat{shops.length !== 1 ? 's' : ''})</span>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {itemsToDisplay.map(product => (
-                            <ProductSearchCard key={product.id} product={product} />
+                        {shops.map(shop => (
+                            <ShopSearchCard key={shop.id} shop={shop} />
                         ))}
                     </div>
                 </div>

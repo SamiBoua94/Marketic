@@ -79,6 +79,13 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             processedTags = initialData.tags;
         }
 
+        let processedOptions: ProductOption[] = [];
+        if (typeof initialData.options === 'string') {
+            try { processedOptions = JSON.parse(initialData.options); } catch (e) { processedOptions = []; }
+        } else if (Array.isArray(initialData.options)) {
+            processedOptions = initialData.options;
+        }
+
         let processedInfo: ProductInfo = {
             ecobalyseMaterials: [],
             ecobalyseUpcycled: false
@@ -95,6 +102,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             stock: String(initialData.stock),
             images: processedImages,
             tags: processedTags,
+            options: processedOptions,
             productInfo: processedInfo
         };
     });
