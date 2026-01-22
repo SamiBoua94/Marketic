@@ -49,22 +49,23 @@ model Shop {
 }
 
 model Product {
-  id          String      @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  stock       Int
-  images      String?     // JSON string or comma separated
-  tags        String?     // JSON string
-  productInfo String?     // JSON string containing materials, sources, etc.
-  options     String?     // JSON string for product options (color, size, etc.)
-  category    String?
-  shopId      String
-  shop        Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String      @id @default(cuid())
+  name         String
+  description  String
+  price        Float
+  stock        Int
+  images       String?     // JSON string or comma separated
+  tags         String?     // JSON string
+  productInfo  String?     // JSON string containing materials, sources, etc.
+  options      String?     // JSON string for product options (color, size, etc.)
+  category     String?
+  ethicalScore Float?     // Score éthique de 0 à 100 (décimal autorisé)
+  shopId       String
+  shop         Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model Cart {

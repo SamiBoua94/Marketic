@@ -5,8 +5,23 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
     try {
-        // Récupération de tous les produits sans nécessiter d'authentification
+        // Récupérer la session pour identifier l'utilisateur connecté
+        const session = await getSession();
+        
+        // Construire la clause where pour exclure les produits de l'utilisateur connecté
+        const whereClause = session 
+            ? {
+                shop: {
+                    NOT: {
+                        userId: session.id
+                    }
+                }
+            }
+            : {}; // Si non connecté, ne filtrer personne
+
+        // Récupération de tous les produits en excluant ceux de l'utilisateur connecté
         const products = await prisma.product.findMany({
+            where: whereClause,
             include: {
                 shop: {
                     select: {
