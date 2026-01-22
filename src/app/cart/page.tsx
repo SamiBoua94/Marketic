@@ -8,9 +8,42 @@ import { useCart } from '@/context/cart-context';
 import { useAuth } from '@/context/auth-context';
 import { Badge } from '@/components/ui/badge';
 
+function normalizeImageUrls(images: unknown): string[] {
+    if (Array.isArray(images)) {
+        return images
+            .filter((v): v is string => typeof v === 'string')
+            .map((v) => v.trim())
+            .filter(Boolean);
+    }
+
+    if (typeof images === 'string') {
+        const trimmed = images.trim();
+        if (!trimmed) return [];
+
+        try {
+            const parsed = JSON.parse(trimmed);
+            return normalizeImageUrls(parsed);
+        } catch {
+            if (trimmed.includes(',')) {
+                return trimmed
+                    .split(',')
+                    .map((v) => v.trim())
+                    .filter(Boolean);
+            }
+
+            return [trimmed];
+        }
+    }
+
+    return [];
+}
+
 export default function CartPage() {
     const { items, removeItem, updateQuantity, totalPrice, totalItems, isLoading } = useCart();
     const { user } = useAuth();
+
+    // Debug: afficher tous les items du panier dans la console
+    console.log('Cart items:', items);
 
     if (!user) {
         return (
@@ -39,7 +72,7 @@ export default function CartPage() {
                 <p className="text-foreground/60 max-w-md mb-8">
                     Parcourez nos produits artisanaux et locaux pour trouver votre bonheur !
                 </p>
-                <Link href="/">
+                <Link href="/products">
                     <Button variant="primary" size="lg">Découvrir les produits</Button>
                 </Link>
             </div>
@@ -65,6 +98,14 @@ export default function CartPage() {
                 {/* Items List */}
                 <div className="lg:col-span-2 space-y-6">
                     {items.map((item) => (
+                        (() => {
+                            const fallbackProductImage = 'https://placehold.co/400x400?text=Produit';
+                            const productImage =
+                                normalizeImageUrls((item as any)?.product?.images)[0] ||
+                                ((item as any)?.product?.image as string) ||
+                                fallbackProductImage;
+
+                            return (
                         <div
                             key={item.id}
                             className="flex gap-4 sm:gap-6 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-secondary/10 shadow-sm hover:shadow-md transition-shadow group"
@@ -72,9 +113,12 @@ export default function CartPage() {
                             {/* Product Image */}
                             <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-secondary/5 flex-shrink-0">
                                 <img
-                                    src={item.product.image || 'https://images.unsplash.com/photo-1541944743827-e04bb645f9ad?auto=format&fit=crop&q=80&w=200'}
+                                    src={productImage}
                                     alt={item.product.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    onError={(e) => {
+                                        e.currentTarget.src = fallbackProductImage;
+                                    }}
                                 />
                             </div>
 
@@ -127,6 +171,8 @@ export default function CartPage() {
                                 </div>
                             </div>
                         </div>
+                            );
+                        })()
                     ))}
 
                     <div className="bg-primary/5 rounded-2xl p-6 flex gap-4 items-start">

@@ -22,15 +22,20 @@ export default function ShopPage() {
             if (shopRes.ok) {
                 const shopData = await shopRes.json();
                 // Extract data from the response structure
-                setShop(shopData.data || shopData.shop);
-            }
+                const resolvedShop = shopData?.data || shopData?.shop;
+                setShop(resolvedShop);
 
-            // Fetch Products (if authenticated)
-            const productsRes = await fetch('/api/products');
-            if (productsRes.ok) {
-                const productsData = await productsRes.json();
-                // Extract data from the response structure
-                setProducts(productsData.data || productsData.products || []);
+                if (resolvedShop?.id) {
+                    const productsRes = await fetch(`/api/shop/${resolvedShop.id}/products`);
+                    if (productsRes.ok) {
+                        const productsData = await productsRes.json();
+                        setProducts(productsData?.data?.items || []);
+                    } else {
+                        setProducts([]);
+                    }
+                } else {
+                    setProducts([]);
+                }
             }
 
         } catch (error) {

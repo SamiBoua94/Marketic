@@ -20,6 +20,7 @@ export default function ProfilePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        console.log('User object:', user); // Debug: afficher l'objet user complet
         if (!loading && !user) {
             router.push("/login");
         }

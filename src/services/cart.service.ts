@@ -32,6 +32,7 @@ export const cartService = {
                   id: true,
                   name: true,
                   price: true,
+                  images: true,
                   // Ajoutez d'autres champs de produit nécessaires
                 }
               }

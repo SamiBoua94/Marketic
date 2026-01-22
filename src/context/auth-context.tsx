@@ -33,22 +33,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkAuthStatus = async () => {
         setLoading(true);
         try {
-            const session = (await getClientSession()) as Session & { user: { id: string; hasShop?: boolean } } | null;
+            const session = await getClientSession();
             
-            if (session?.user) {
-                // Vérifier si l'utilisateur a une boutique
-                const hasShopResponse = await fetch('/api/shop/check', { credentials: 'include' });
-                const hasShop = hasShopResponse.ok ? await hasShopResponse.json().then(res => res.hasShop) : false;
+            if (session) {
+                // Récupérer toutes les infos utilisateur depuis /api/user/me
+                const userResponse = await fetch('/api/user/me', { credentials: 'include' });
                 
-                setUser({
-                    id: session.user.id,
-                    email: session.user.email || '',
-                    name: session.user.name || '',
-                    profilePicture: session.user.image || null,
-                    description: null,
-                    hasShop,
-                    createdAt: new Date().toISOString(),
-                });
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    setUser(userData.user);
+                } else {
+                    console.error('Failed to fetch user data');
+                    setUser(null);
+                }
             } else {
                 setUser(null);
             }

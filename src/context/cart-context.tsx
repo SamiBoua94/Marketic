@@ -13,6 +13,7 @@ export type CartItem = {
         name: string;
         price: number;
         image?: string;
+        images?: string[];
     };
 };
 
@@ -46,6 +47,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             const response = await fetch('/api/cart', { credentials: 'include' });
             if (response.ok) {
                 const data = await response.json();
+                console.log("dataCart =",data);
                 setItems(data.items || []);
             }
         } catch (error) {
