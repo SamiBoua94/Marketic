@@ -30,7 +30,7 @@ export default function ProductsPage() {
         const fetchProducts = async () => {
             try {
                 setIsLoading(true);
-                const response = await fetch('/api/products/catalog');
+                const response = await fetch('/api/products/');
                 if (!response.ok) {
                     throw new Error('Erreur lors de la récupération des produits');
                 }

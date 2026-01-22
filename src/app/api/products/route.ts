@@ -5,21 +5,24 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
-        }
-
-        const shop = await prisma.shop.findUnique({
-            where: { userId: session.id },
-            include: { products: true } // Include products in the response
+        // Récupération de tous les produits sans nécessiter d'authentification
+        const products = await prisma.product.findMany({
+            include: {
+                shop: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profilePicture: true,
+                        bannerPicture: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc' // Les produits les plus récents en premier
+            }
         });
 
-        if (!shop) {
-            return NextResponse.json({ error: 'Boutique introuvable' }, { status: 404 });
-        }
-
-        return NextResponse.json({ products: shop.products });
+        return NextResponse.json({ products });
     } catch (error) {
         console.error('Error fetching products:', error);
         return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
