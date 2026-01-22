@@ -24,10 +24,12 @@ export default function BoutiquesPage() {
     const fetchShops = async () => {
       try {
         const response = await fetch(`/api/shops?query=${searchQuery}`);
-        const data = await response.json();
-        setShops(data);
+        const result = await response.json();
+        // API returns { success: true, data: [...] } via successResponse()
+        setShops(result.data || []);
       } catch (error) {
         console.error('Error fetching shops:', error);
+        setShops([]);
       } finally {
         setIsLoading(false);
       }
@@ -116,259 +118,259 @@ export default function BoutiquesPage() {
           </div>
         </div>
 
-      {isLoading ? (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '1.5rem',
-          marginTop: '1.5rem',
-          width: '100%',
-          padding: '0 0.5rem'
-        }}>
-          {[...Array(4)].map((_, i) => (
-            <div key={i} style={{
-              border: '1px solid var(--border)',
-              borderRadius: '0.5rem',
-              overflow: 'hidden',
-              backgroundColor: 'var(--card)',
-              color: 'var(--card-foreground)'
-            }}>
-              <div style={{
-                height: '12rem',
-                backgroundColor: 'var(--muted)',
-                borderRadius: '0.5rem 0.5rem 0 0',
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-              }} />
-              <div style={{ padding: '1.5rem' }}>
-                <div style={{
-                  height: '1.5rem',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: '0.25rem',
-                  width: '75%',
-                  marginBottom: '0.5rem',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                }} />
-                <div style={{
-                  height: '1rem',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: '0.25rem',
-                  width: '50%',
-                  marginBottom: '1rem',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '1.75rem',
-          marginTop: '1.5rem',
-          width: '100%',
-          padding: '0 0.5rem'
-        }}>
-          {shops.map((shop) => (
-            <Link 
-              key={shop.id} 
-              href={`/boutiques/${shop.id}`} 
-              style={{
-                textDecoration: 'none',
-                color: 'inherit'
-              }}
-            >
-              <div 
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: '0.75rem',
-                  overflow: 'hidden',
-                  backgroundColor: 'var(--card)',
-                  color: 'var(--card-foreground)',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.05)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.boxShadow = '0 2px 4px 0 rgba(0, 0, 0, 0.05)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
+        {isLoading ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.5rem',
+            marginTop: '1.5rem',
+            width: '100%',
+            padding: '0 0.5rem'
+          }}>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} style={{
+                border: '1px solid var(--border)',
+                borderRadius: '0.5rem',
+                overflow: 'hidden',
+                backgroundColor: 'var(--card)',
+                color: 'var(--card-foreground)'
+              }}>
                 <div style={{
                   height: '12rem',
                   backgroundColor: 'var(--muted)',
-                  overflow: 'hidden',
-                  position: 'relative',
-                  borderBottom: '1px solid var(--border)'
-                }}>
-                  {shop.profilePicture || shop.bannerPicture ? (
-                    <div style={{
-                      width: '100%',
-                      height: '100%',
-                      overflow: 'hidden'
-                    }}>
-                      <img
-                        src={shop.profilePicture || shop.bannerPicture || ''}
-                        alt={shop.name}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.5s ease',
-                          transform: 'scale(1)'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div style={{
-                      width: '100%',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'var(--muted)',
-                      padding: '1.5rem',
-                      textAlign: 'center'
-                    }}>
-                      <div style={{
-                        width: '3rem',
-                        height: '3rem',
-                        borderRadius: '50%',
-                        backgroundColor: 'var(--muted-foreground)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '1rem',
-                        opacity: 0.5
-                      }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--background)' }}>
-                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                          <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                      </div>
-                      <span style={{ 
-                        color: 'var(--muted-foreground)',
-                        fontSize: '0.875rem'
-                      }}>
-                        Aucune image disponible
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div style={{ 
-                  padding: '1.5rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flex: '1'
-                }}>
-                  <div style={{ flex: '1' }}>
-                    <h3 style={{
-                      fontSize: '1.25rem',
-                      fontWeight: '600',
-                      margin: '0 0 0.5rem 0',
-                      color: 'var(--foreground)',
-                      lineHeight: '1.3'
-                    }}>
-                      {shop.name}
-                    </h3>
-                    {shop.description && (
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--muted-foreground)',
-                        margin: '0 0 0.75rem 0',
-                        lineHeight: '1.5',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
-                      }}>
-                        {shop.description}
-                      </p>
-                    )}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      margin: '0.75rem 0 1rem 0',
-                      color: 'var(--muted-foreground)'
-                    }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                      <span style={{
-                        fontSize: '0.875rem',
-                        lineHeight: '1.4',
-                        flex: '1',
-                        minWidth: 0,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        {[shop.address, shop.postalCode, shop.city].filter(Boolean).join(', ')}
-                      </span>
-                    </div>
-                  </div>
-                  <button 
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: '0.5rem',
-                      backgroundColor: 'var(--primary)',
-                      color: 'var(--primary-foreground)',
-                      fontWeight: 500,
-                      fontSize: '0.9375rem',
-                      lineHeight: '1.5',
-                      padding: '0.625rem 1.25rem',
-                      width: '100%',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      marginTop: 'auto'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--primary)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                    onMouseDown={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                    onTouchStart={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    <span>Voir la boutique</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '0.5rem' }}>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                  </button>
+                  borderRadius: '0.5rem 0.5rem 0 0',
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }} />
+                <div style={{ padding: '1.5rem' }}>
+                  <div style={{
+                    height: '1.5rem',
+                    backgroundColor: 'var(--muted)',
+                    borderRadius: '0.25rem',
+                    width: '75%',
+                    marginBottom: '0.5rem',
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }} />
+                  <div style={{
+                    height: '1rem',
+                    backgroundColor: 'var(--muted)',
+                    borderRadius: '0.25rem',
+                    width: '50%',
+                    marginBottom: '1rem',
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }} />
                 </div>
               </div>
-            </Link>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '1.75rem',
+            marginTop: '1.5rem',
+            width: '100%',
+            padding: '0 0.5rem'
+          }}>
+            {shops.map((shop) => (
+              <Link
+                key={shop.id}
+                href={`/boutique/${shop.id}`}
+                style={{
+                  textDecoration: 'none',
+                  color: 'inherit'
+                }}
+              >
+                <div
+                  style={{
+                    border: '1px solid var(--border)',
+                    borderRadius: '0.75rem',
+                    overflow: 'hidden',
+                    backgroundColor: 'var(--card)',
+                    color: 'var(--card-foreground)',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.05)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)';
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.boxShadow = '0 2px 4px 0 rgba(0, 0, 0, 0.05)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{
+                    height: '12rem',
+                    backgroundColor: 'var(--muted)',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    borderBottom: '1px solid var(--border)'
+                  }}>
+                    {shop.profilePicture || shop.bannerPicture ? (
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        overflow: 'hidden'
+                      }}>
+                        <img
+                          src={shop.profilePicture || shop.bannerPicture || ''}
+                          alt={shop.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.5s ease',
+                            transform: 'scale(1)'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'var(--muted)',
+                        padding: '1.5rem',
+                        textAlign: 'center'
+                      }}>
+                        <div style={{
+                          width: '3rem',
+                          height: '3rem',
+                          borderRadius: '50%',
+                          backgroundColor: 'var(--muted-foreground)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginBottom: '1rem',
+                          opacity: 0.5
+                        }}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--background)' }}>
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                          </svg>
+                        </div>
+                        <span style={{
+                          color: 'var(--muted-foreground)',
+                          fontSize: '0.875rem'
+                        }}>
+                          Aucune image disponible
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    padding: '1.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flex: '1'
+                  }}>
+                    <div style={{ flex: '1' }}>
+                      <h3 style={{
+                        fontSize: '1.25rem',
+                        fontWeight: '600',
+                        margin: '0 0 0.5rem 0',
+                        color: 'var(--foreground)',
+                        lineHeight: '1.3'
+                      }}>
+                        {shop.name}
+                      </h3>
+                      {shop.description && (
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: 'var(--muted-foreground)',
+                          margin: '0 0 0.75rem 0',
+                          lineHeight: '1.5',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {shop.description}
+                        </p>
+                      )}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        margin: '0.75rem 0 1rem 0',
+                        color: 'var(--muted-foreground)'
+                      }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span style={{
+                          fontSize: '0.875rem',
+                          lineHeight: '1.4',
+                          flex: '1',
+                          minWidth: 0,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {[shop.address, shop.postalCode, shop.city].filter(Boolean).join(', ')}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '0.5rem',
+                        backgroundColor: 'var(--primary)',
+                        color: 'var(--primary-foreground)',
+                        fontWeight: 500,
+                        fontSize: '0.9375rem',
+                        lineHeight: '1.5',
+                        padding: '0.625rem 1.25rem',
+                        width: '100%',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        marginTop: 'auto'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--primary)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      onMouseDown={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      onTouchStart={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      <span>Voir la boutique</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '0.5rem' }}>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
