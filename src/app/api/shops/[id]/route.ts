@@ -1,65 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { handleError, successResponse } from '@/middleware/error.handler';
+import { NotFoundException } from '@/exceptions/http.exception';
 
-// Version simplifiée pour la compatibilité avec Next.js 14
+// Public API to get a single shop by ID
 export async function GET(
-  request: NextRequest,
-  { params }: any
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
-  const shopId = params?.id;
-  
-  if (!shopId) {
-    return NextResponse.json(
-      { error: 'ID de boutique manquant' },
-      { status: 400 }
-    );
-  }
-  try {
-    // Journalisation pour le débogage
-    console.log('Recherche de la boutique avec ID:', shopId);
-    console.log('Type de shopId:', typeof shopId);
+    try {
+        const { id } = await params;
 
-    // Vérifier si la boutique existe dans la base de données
-    const shop = await prisma.shop.findUnique({
-      where: { id: shopId },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        profilePicture: true,
-        bannerPicture: true,
-        address: true,
-        city: true,
-        postalCode: true,
-        phone: true,
-        email: true,
-        instagram: true,
-        facebook: true,
-        twitter: true,
-        // Ajoutez d'autres champs nécessaires
-      },
-    });
+        const shop = await prisma.shop.findUnique({
+            where: { id },
+            include: {
+                user: { select: { name: true, profilePicture: true } },
+                products: {
+                    orderBy: { createdAt: 'desc' }
+                }
+            }
+        });
 
-    if (!shop) {
-      return NextResponse.json(
-        { error: 'Boutique non trouvée' },
-        { status: 404 }
-      );
+        if (!shop) {
+            throw new NotFoundException('Boutique introuvable');
+        }
+
+        return successResponse(shop);
+    } catch (error) {
+        return handleError(error);
     }
-
-    // Simuler une note pour l'exemple (à remplacer par la logique réelle)
-    const shopWithRating = {
-      ...shop,
-      rating: 4.5, // Remplacez par la moyenne réelle des avis
-      tags: shop.description ? shop.description.split(/[\s,]+/).slice(0, 5) : []
-    };
-
-    return NextResponse.json(shopWithRating);
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la boutique:', error);
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    );
-  }
 }

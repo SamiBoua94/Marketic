@@ -1,8 +1,16 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
-import { Camera, Save, X, Trash, Plus, Tag, Info, Upload, Award } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Camera, Save, X, Trash, Plus, Tag, Leaf, Loader2, Award } from 'lucide-react';
+import {
+    EcobalyseProductType,
+    EcobalyseFabricProcess,
+    EcobalyseMaterialOption,
+    EcobalyseProductOption,
+    EcobalyseCountry,
+    EcobalyseScore
+} from '@/types/ecobalyse.types';
 
 interface ProductOption {
     name: string;
@@ -22,15 +30,13 @@ interface ProductData {
 }
 
 interface ProductInfo {
-    materials: string;
-    materialSources: string;
-    purchaseLocation: string;
-    handmadeOrPurchased: string;
-    supplyChainSteps: string;
-    traceabilityDocuments: string;
-    materialsList?: string[];
-    additionalInfo?: string;
-    proofs?: string[];
+    // Ecobalyse fields
+    ecobalyseProductType?: EcobalyseProductType;
+    ecobalyseMass?: number;
+    ecobalyseMaterials?: { id: string; share: number; country?: string }[];
+    ecobalyseCountryMaking?: string;
+    ecobalyseFabricProcess?: EcobalyseFabricProcess;
+    ecobalyseUpcycled?: boolean;
 }
 
 interface ProductFormProps {
@@ -52,15 +58,8 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                 tags: [],
                 options: [],
                 productInfo: {
-                    materials: '',
-                    materialSources: '',
-                    purchaseLocation: '',
-                    handmadeOrPurchased: '',
-                    supplyChainSteps: '',
-                    traceabilityDocuments: '',
-                    materialsList: [],
-                    additionalInfo: '',
-                    proofs: []
+                    ecobalyseMaterials: [],
+                    ecobalyseUpcycled: false
                 }
             };
         }
@@ -80,14 +79,16 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             processedTags = initialData.tags;
         }
 
+        let processedOptions: ProductOption[] = [];
+        if (typeof initialData.options === 'string') {
+            try { processedOptions = JSON.parse(initialData.options); } catch (e) { processedOptions = []; }
+        } else if (Array.isArray(initialData.options)) {
+            processedOptions = initialData.options;
+        }
+
         let processedInfo: ProductInfo = {
-            materials: '',
-            materialSources: '',
-            purchaseLocation: '',
-            handmadeOrPurchased: '',
-            supplyChainSteps: '',
-            traceabilityDocuments: '',
-            proofs: []
+            ecobalyseMaterials: [],
+            ecobalyseUpcycled: false
         };
         if (typeof initialData.productInfo === 'string') {
             try { processedInfo = JSON.parse(initialData.productInfo); } catch (e) { }
@@ -101,6 +102,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             stock: String(initialData.stock),
             images: processedImages,
             tags: processedTags,
+            options: processedOptions,
             productInfo: processedInfo
         };
     });
@@ -108,11 +110,141 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     const [showProductInfo, setShowProductInfo] = useState(false);
     const [newTag, setNewTag] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const proofInputRef = useRef<HTMLInputElement>(null);
 
+    // Ecobalyse states
+    const [ecobalyseMaterials, setEcobalyseMaterials] = useState<EcobalyseMaterialOption[]>([]);
+    const [ecobalyseProducts, setEcobalyseProducts] = useState<EcobalyseProductOption[]>([]);
+    const [ecobalyseCountries, setEcobalyseCountries] = useState<EcobalyseCountry[]>([]);
+    const [ecobalyseScore, setEcobalyseScore] = useState<EcobalyseScore>({ calculated: false });
+    const [ecobalyseLoading, setEcobalyseLoading] = useState(false);
 
+    // Load Ecobalyse reference data
+    useEffect(() => {
+        const loadEcobalyseData = async () => {
+            try {
+                const [materialsRes, productsRes, countriesRes] = await Promise.all([
+                    fetch('/api/ecobalyse?type=materials'),
+                    fetch('/api/ecobalyse?type=products'),
+                    fetch('/api/ecobalyse?type=countries')
+                ]);
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isProof: boolean = false) => {
+                if (materialsRes.ok) {
+                    const materials = await materialsRes.json();
+                    setEcobalyseMaterials(materials);
+                }
+                if (productsRes.ok) {
+                    const products = await productsRes.json();
+                    setEcobalyseProducts(products);
+                }
+                if (countriesRes.ok) {
+                    const countries = await countriesRes.json();
+                    setEcobalyseCountries(countries);
+                }
+            } catch (error) {
+                console.error('Erreur chargement données Ecobalyse:', error);
+            }
+        };
+
+        loadEcobalyseData();
+    }, []);
+
+    // Calculate Ecobalyse score
+    const calculateEcobalyseScore = async () => {
+        const info = data.productInfo;
+        if (!info?.ecobalyseProductType || !info?.ecobalyseMass || !info?.ecobalyseMaterials?.length) {
+            setEcobalyseScore({
+                calculated: false,
+                error: 'Veuillez remplir le type de produit, la masse et au moins une matière'
+            });
+            return;
+        }
+
+        // Check materials sum = 100%
+        const totalShare = info.ecobalyseMaterials.reduce((sum, mat) => sum + mat.share, 0);
+        if (Math.abs(totalShare - 1) > 0.01) {
+            setEcobalyseScore({
+                calculated: false,
+                error: `La somme des parts de matières doit être égale à 100% (actuel: ${Math.round(totalShare * 100)}%)`
+            });
+            return;
+        }
+
+        setEcobalyseLoading(true);
+        setEcobalyseScore({ calculated: false });
+
+        try {
+            const query = {
+                mass: info.ecobalyseMass,
+                product: info.ecobalyseProductType,
+                materials: info.ecobalyseMaterials,
+                countryMaking: info.ecobalyseCountryMaking || undefined,
+                fabricProcess: info.ecobalyseFabricProcess || undefined,
+                upcycled: info.ecobalyseUpcycled || false
+            };
+
+            const response = await fetch('/api/ecobalyse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(query)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erreur de calcul');
+            }
+
+            const result = await response.json();
+            setEcobalyseScore({
+                calculated: true,
+                pef: result.impacts?.pef,
+                cch: result.impacts?.cch,
+                ecs: result.impacts?.ecs
+            });
+        } catch (error: any) {
+            setEcobalyseScore({
+                calculated: false,
+                error: error.message || 'Erreur lors du calcul du score'
+            });
+        } finally {
+            setEcobalyseLoading(false);
+        }
+    };
+
+    // Add Ecobalyse material
+    const addEcobalyseMaterial = () => {
+        setData(prev => ({
+            ...prev,
+            productInfo: {
+                ...prev.productInfo!,
+                ecobalyseMaterials: [...(prev.productInfo?.ecobalyseMaterials || []), { id: '', share: 0 }]
+            }
+        }));
+    };
+
+    // Remove Ecobalyse material
+    const removeEcobalyseMaterial = (index: number) => {
+        setData(prev => ({
+            ...prev,
+            productInfo: {
+                ...prev.productInfo!,
+                ecobalyseMaterials: prev.productInfo?.ecobalyseMaterials?.filter((_, i) => i !== index) || []
+            }
+        }));
+    };
+
+    // Update Ecobalyse material
+    const updateEcobalyseMaterial = (index: number, field: 'id' | 'share' | 'country', value: string | number) => {
+        setData(prev => {
+            const materials = [...(prev.productInfo?.ecobalyseMaterials || [])];
+            materials[index] = { ...materials[index], [field]: value };
+            return {
+                ...prev,
+                productInfo: { ...prev.productInfo!, ecobalyseMaterials: materials }
+            };
+        });
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -129,24 +261,10 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             if (!res.ok) throw new Error('Upload failed');
 
             const resData = await res.json();
-
-            if (isProof) {
-                setData(prev => {
-                    const newInfo = {
-                        ...prev.productInfo!,
-                        proofs: [...(prev.productInfo?.proofs || []), resData.url]
-                    };
-                    return {
-                        ...prev,
-                        productInfo: newInfo
-                    };
-                });
-            } else {
-                setData(prev => ({
-                    ...prev,
-                    images: [...(prev.images || []), resData.url]
-                }));
-            }
+            setData(prev => ({
+                ...prev,
+                images: [...(prev.images || []), resData.url]
+            }));
         } catch (error) {
             console.error('Error uploading file:', error);
             alert('Erreur lors du téléchargement');
@@ -160,19 +278,6 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             ...prev,
             images: prev.images?.filter((_, index) => index !== indexToRemove)
         }));
-    };
-
-    const removeProof = (indexToRemove: number) => {
-        setData(prev => {
-            const newInfo = {
-                ...prev.productInfo!,
-                proofs: prev.productInfo?.proofs?.filter((_, index) => index !== indexToRemove) || []
-            };
-            return {
-                ...prev,
-                productInfo: newInfo
-            };
-        });
     };
 
     const addTag = (e: React.KeyboardEvent) => {
@@ -193,19 +298,6 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             ...prev,
             tags: prev.tags?.filter(t => t !== tagToRemove)
         }));
-    };
-
-    const handleInfoChange = (field: keyof ProductInfo, value: string) => {
-        setData(prev => {
-            const newInfo = {
-                ...prev.productInfo!,
-                [field]: value
-            };
-            return {
-                ...prev,
-                productInfo: newInfo
-            };
-        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -274,7 +366,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                         <input
                             type="file"
                             ref={fileInputRef}
-                            onChange={(e) => handleFileUpload(e, false)}
+                            onChange={handleFileUpload}
                             className="hidden"
                             accept="image/*"
                         />
@@ -319,7 +411,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     </div>
                 </div>
 
-                {/* Tags (Replacement for Category) */}
+                {/* Tags */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags</label>
                     <div className="flex flex-wrap gap-2 mb-2">
@@ -426,176 +518,225 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     />
                 </div>
 
-                {/* Product Info Section Toggle */}
+                {/* Score Environnemental Section */}
                 <div className="border-t border-zinc-200 dark:border-zinc-800 pt-6">
                     <button
                         type="button"
                         onClick={() => setShowProductInfo(!showProductInfo)}
-                        className="w-full flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/30 dark:hover:to-emerald-900/30 transition-colors border border-green-200 dark:border-green-800"
                     >
                         <div className="flex items-center gap-3">
-                            <Info className="text-emerald-600" size={24} />
+                            <Leaf className="text-green-600" size={24} />
                             <div className="text-left">
-                                <span className="font-semibold block">Informations produit</span>
-                                <span className="text-xs text-zinc-500">Transparence et traçabilité pour vos clients</span>
+                                <span className="font-semibold block text-green-800 dark:text-green-200">Score Environnemental</span>
+                                <span className="text-xs text-green-600 dark:text-green-400">Calculez l'impact de votre produit textile</span>
                             </div>
                         </div>
-                        <Plus className={`transition-transform ${showProductInfo ? 'rotate-45' : ''}`} />
+                        <Plus className={`text-green-600 transition-transform ${showProductInfo ? 'rotate-45' : ''}`} />
                     </button>
 
                     {showProductInfo && (
-                        <div className="mt-4 space-y-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Matières</label>
-                                <input
-                                    type="text"
-                                    value={data.productInfo?.materials}
-                                    onChange={(e) => handleInfoChange('materials', e.target.value)}
-                                    placeholder="Ex: Coton bio, Bois flotté..."
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Source des matériaux</label>
-                                <input
-                                    type="text"
-                                    value={data.productInfo?.materialSources}
-                                    onChange={(e) => handleInfoChange('materialSources', e.target.value)}
-                                    placeholder="Ex: Fournisseur local, Recyclage..."
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Où avez-vous acheté le produit de base ?</label>
-                                <input
-                                    type="text"
-                                    value={data.productInfo?.purchaseLocation}
-                                    onChange={(e) => handleInfoChange('purchaseLocation', e.target.value)}
-                                    placeholder="Ex: Mercerie du coin, Site spécialisé..."
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Fait main ou acheté tels quels ?</label>
-                                <select
-                                    value={data.productInfo?.handmadeOrPurchased}
-                                    onChange={(e) => handleInfoChange('handmadeOrPurchased', e.target.value)}
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
-                                >
-                                    <option value="">Sélectionner</option>
-                                    <option value="handmade">Fait main de A à Z</option>
-                                    <option value="customized">Acheté et personnalisé</option>
-                                    <option value="resale">Revendu tel quel</option>
-                                </select>
-                            </div>
+                        <div className="mt-4 space-y-4 p-4 border border-green-200 dark:border-green-800 rounded-xl bg-green-50/50 dark:bg-green-900/10">
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Pouvez-vous décrire les principales étapes de la chaîne d'approvisionnement de ce produit ?</label>
-                                <textarea
-                                    value={data.productInfo?.supplyChainSteps}
-                                    onChange={(e) => handleInfoChange('supplyChainSteps', e.target.value)}
-                                    placeholder="Décrivez les étapes de fabrication et de transport..."
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Sur quels documents (certificats, factures, bordereaux) vous appuyez-vous pour garantir la traçabilité ?</label>
-                                <textarea
-                                    value={data.productInfo?.traceabilityDocuments}
-                                    onChange={(e) => handleInfoChange('traceabilityDocuments', e.target.value)}
-                                    placeholder="Ex: Factures fournisseurs, Certificats d'origine..."
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
-                                />
-                            </div>
-
-                            {/* Materials List */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Liste des matériaux</label>
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                    {data.productInfo?.materialsList?.map((mat, index) => (
-                                        <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs">
-                                            {mat}
-                                            <button type="button" onClick={() => {
-                                                const newList = data.productInfo?.materialsList?.filter((_, i) => i !== index) || [];
-                                                setData(prev => ({
-                                                    ...prev,
-                                                    productInfo: { ...prev.productInfo!, materialsList: newList }
-                                                }));
-                                            }}>
-                                                <X size={10} />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Ajouter un matériau (Entrée)"
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const value = (e.target as HTMLInputElement).value.trim();
-                                            if (value) {
-                                                setData(prev => ({
-                                                    ...prev,
-                                                    productInfo: {
-                                                        ...prev.productInfo!,
-                                                        materialsList: [...(prev.productInfo?.materialsList || []), value]
-                                                    }
-                                                }));
-                                                (e.target as HTMLInputElement).value = '';
-                                            }
-                                        }
-                                    }}
-                                />
-                            </div>
-
-                            {/* Additional Info */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Informations additionnelles</label>
-                                <textarea
-                                    value={data.productInfo?.additionalInfo || ''}
-                                    onChange={(e) => setData(prev => ({
-                                        ...prev,
-                                        productInfo: { ...prev.productInfo!, additionalInfo: e.target.value }
-                                    }))}
-                                    placeholder="Toute information complémentaire sur le produit..."
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none min-h-[80px]"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium block">Preuves du produit (Photos, factures...)</label>
-                                <div className="flex flex-wrap gap-3">
-                                    {data.productInfo?.proofs?.map((proof, index) => (
-                                        <div key={index} className="relative w-16 h-16 rounded border dark:border-zinc-700 group">
-                                            <img src={proof} className="w-full h-full object-cover rounded" />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeProof(index)}
-                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                <X size={10} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        type="button"
-                                        onClick={() => proofInputRef.current?.click()}
-                                        className="w-16 h-16 rounded border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center text-zinc-400 hover:border-emerald-500 hover:text-emerald-500"
-                                    >
-                                        <Upload size={16} />
-                                        <span className="text-[10px] mt-1">Preuve</span>
-                                    </button>
+                            {/* Produit remanufacturé (upcycled) */}
+                            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                                <label className="flex items-center gap-3 cursor-pointer">
                                     <input
-                                        type="file"
-                                        ref={proofInputRef}
-                                        onChange={(e) => handleFileUpload(e, true)}
-                                        className="hidden"
+                                        type="checkbox"
+                                        checked={data.productInfo?.ecobalyseUpcycled || false}
+                                        onChange={(e) => setData(prev => ({
+                                            ...prev,
+                                            productInfo: { ...prev.productInfo!, ecobalyseUpcycled: e.target.checked }
+                                        }))}
+                                        className="w-5 h-5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
+                                    />
+                                    <div>
+                                        <span className="font-medium text-amber-800 dark:text-amber-200">Produit remanufacturé / upcyclé</span>
+                                        <p className="text-xs text-amber-600 dark:text-amber-400">Cochez si le produit est fabriqué à partir de matériaux recyclés (réduit l'impact)</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {/* Type de produit */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Type de produit textile *</label>
+                                    <select
+                                        value={data.productInfo?.ecobalyseProductType || ''}
+                                        onChange={(e) => setData(prev => ({
+                                            ...prev,
+                                            productInfo: { ...prev.productInfo!, ecobalyseProductType: e.target.value as EcobalyseProductType }
+                                        }))}
+                                        className="w-full px-4 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-green-500 outline-none"
+                                    >
+                                        <option value="">Sélectionner un type</option>
+                                        {ecobalyseProducts.map(product => (
+                                            <option key={product.id} value={product.id}>{product.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Masse du produit (kg) *</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        value={data.productInfo?.ecobalyseMass ?? ''}
+                                        onChange={(e) => {
+                                            const val = parseFloat(e.target.value);
+                                            setData(prev => ({
+                                                ...prev,
+                                                productInfo: { ...prev.productInfo!, ecobalyseMass: isNaN(val) ? undefined : val }
+                                            }));
+                                        }}
+                                        placeholder="Ex: 0.17 pour un t-shirt"
+                                        className="w-full px-4 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-green-500 outline-none"
                                     />
                                 </div>
                             </div>
+
+                            {/* Composition des matières */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-green-800 dark:text-green-200">
+                                    Composition des matières * <span className="text-xs text-green-600">(total: {Math.round((data.productInfo?.ecobalyseMaterials?.reduce((sum, m) => sum + m.share, 0) || 0) * 100)}%)</span>
+                                </label>
+                                <div className="space-y-2">
+                                    {data.productInfo?.ecobalyseMaterials?.map((mat, index) => (
+                                        <div key={index} className="flex gap-2 items-center flex-wrap">
+                                            <select
+                                                value={mat.id}
+                                                onChange={(e) => updateEcobalyseMaterial(index, 'id', e.target.value)}
+                                                className="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                            >
+                                                <option value="">Sélectionner une matière</option>
+                                                {ecobalyseMaterials.map(m => (
+                                                    <option key={m.id} value={m.id}>{m.name}</option>
+                                                ))}
+                                            </select>
+                                            <div className="flex items-center gap-1">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="100"
+                                                    value={Math.round(mat.share * 100) || ''}
+                                                    onChange={(e) => updateEcobalyseMaterial(index, 'share', (parseInt(e.target.value) || 0) / 100)}
+                                                    className="w-16 px-2 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm text-center"
+                                                    placeholder="100"
+                                                />
+                                                <span className="text-sm">%</span>
+                                            </div>
+                                            <select
+                                                value={mat.country || ''}
+                                                onChange={(e) => updateEcobalyseMaterial(index, 'country', e.target.value)}
+                                                className="w-32 px-2 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                            >
+                                                <option value="">Origine</option>
+                                                {ecobalyseCountries.map(c => (
+                                                    <option key={c.code} value={c.code}>{c.name}</option>
+                                                ))}
+                                            </select>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeEcobalyseMaterial(index)}
+                                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                            >
+                                                <Trash size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={addEcobalyseMaterial}
+                                    className="w-full py-2 border border-dashed border-green-300 dark:border-green-700 rounded-lg text-green-600 hover:border-green-500 hover:bg-green-50/50 transition-colors flex items-center justify-center gap-2 text-sm"
+                                >
+                                    <Plus size={14} /> Ajouter une matière
+                                </button>
+                            </div>
+
+                            {/* Pays de fabrication */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Pays de confection</label>
+                                    <select
+                                        value={data.productInfo?.ecobalyseCountryMaking || ''}
+                                        onChange={(e) => setData(prev => ({
+                                            ...prev,
+                                            productInfo: { ...prev.productInfo!, ecobalyseCountryMaking: e.target.value }
+                                        }))}
+                                        className="w-full px-3 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                    >
+                                        <option value="">Non spécifié</option>
+                                        {ecobalyseCountries.map(c => (
+                                            <option key={c.code} value={c.code}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Procédé de fabrication</label>
+                                    <select
+                                        value={data.productInfo?.ecobalyseFabricProcess || ''}
+                                        onChange={(e) => setData(prev => ({
+                                            ...prev,
+                                            productInfo: { ...prev.productInfo!, ecobalyseFabricProcess: e.target.value as EcobalyseFabricProcess }
+                                        }))}
+                                        className="w-full px-3 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                    >
+                                        <option value="">Non spécifié</option>
+                                        <option value="knitting-mix">Tricotage moyen</option>
+                                        <option value="knitting-circular">Tricotage circulaire</option>
+                                        <option value="knitting-straight">Tricotage rectiligne</option>
+                                        <option value="weaving">Tissage</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Bouton de calcul */}
+                            <div className="pt-4 border-t border-green-200 dark:border-green-800">
+                                <button
+                                    type="button"
+                                    onClick={calculateEcobalyseScore}
+                                    disabled={ecobalyseLoading}
+                                    className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg flex items-center justify-center gap-2 font-medium disabled:opacity-50"
+                                >
+                                    {ecobalyseLoading ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={18} />
+                                            Calcul en cours...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Leaf size={18} />
+                                            Calculer le score environnemental
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* Score display */}
+                            {ecobalyseScore.error && (
+                                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
+                                    ⚠️ {ecobalyseScore.error}
+                                </div>
+                            )}
+
+                            {ecobalyseScore.calculated && (
+                                <div className="p-4 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border border-green-300 dark:border-green-700">
+                                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center gap-2">
+                                        <Award className="text-green-600" size={20} />
+                                        Résultats du score environnemental
+                                    </h4>
+                                    <div className="flex justify-center">
+                                        <div className="text-center p-4 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-green-100 dark:border-green-900/50 min-w-[150px]">
+                                            <div className="text-3xl font-bold text-emerald-600">{ecobalyseScore.ecs?.toFixed(0) || '-'}</div>
+                                            <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Impact (µPts)</div>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-green-600 dark:text-green-400 mt-3 text-center">
+                                        Calculé via l'API Ecobalyse - Plus le score est bas, meilleur est l'impact
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -625,4 +766,3 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
         </form>
     );
 }
-
