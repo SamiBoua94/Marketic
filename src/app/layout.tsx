@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import { HeaderSwitcher } from "@/components/layout/header-switcher";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/context/auth-context";
+import { CartProvider } from "@/context/cart-context";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,11 +32,13 @@ export default function RootLayout({
                 className={`${inter.variable} ${outfit.variable} antialiased min-h-screen flex flex-col font-sans`}
             >
                 <AuthProvider>
-                    <HeaderSwitcher />
-                    <main className="flex-1">
-                        {children}
-                    </main>
-                    <Footer />
+                    <CartProvider>
+                        <HeaderSwitcher />
+                        <main className="flex-1">
+                            {children}
+                        </main>
+                        <Footer />
+                    </CartProvider>
                 </AuthProvider>
             </body>
         </html>

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { jwtDecode } from 'jose';
+import { jwtVerify } from 'jose';
 import { env } from '@/config/env';
 import { UnauthorizedException } from '@/exceptions/http.exception';
 
@@ -22,7 +22,7 @@ export async function verifyAuth(request: NextRequest) {
 
     try {
         const secret = new TextEncoder().encode(env.JWT_SECRET);
-        const { payload } = await jwtDecode(token, { secret });
+        const { payload } = await jwtVerify(token, secret);
         return payload;
     } catch (error) {
         throw new UnauthorizedException('Invalid or expired token');

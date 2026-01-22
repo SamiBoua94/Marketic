@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { cartService } from '@/services/cart.service';
-import { authOptions } from '@/lib/auth';
+import { getSession } from '@/lib/auth';
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const session = await getSession();
+  if (!session?.id) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
 
   try {
-    const cart = await cartService.getOrCreateUserCart(session.user.id);
+    const cart = await cartService.getOrCreateUserCart(session.id);
     return NextResponse.json(cart);
   } catch (error) {
     return NextResponse.json(
@@ -21,15 +20,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const session = await getSession();
+  if (!session?.id) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
 
   try {
     const { productId, quantity = 1 } = await request.json();
     const cartItem = await cartService.addToCart(
-      session.user.id,
+      session.id,
       productId,
       quantity
     );
@@ -43,8 +42,8 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const session = await getSession();
+  if (!session?.id) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
 
@@ -61,15 +60,15 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const session = await getSession();
+  if (!session?.id) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   }
 
   try {
     const { searchParams } = new URL(request.url);
     const cartItemId = searchParams.get('cartItemId');
-    
+
     if (!cartItemId) {
       return NextResponse.json(
         { error: 'ID de l\'article manquant' },

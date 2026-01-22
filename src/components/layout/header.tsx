@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
+import { useCart } from '@/context/cart-context';
 import { useState, useRef, useEffect } from 'react';
 
 export function Header() {
     const router = useRouter();
     const { user, loading, logout } = useAuth();
+    const { totalItems } = useCart();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -71,8 +73,14 @@ export function Header() {
                     <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
                         Notre Mission
                     </Link>
+                    <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
+                        Catalogue
+                    </Link>
                     <Link href="/services" className="text-sm font-medium hover:text-primary transition-colors">
                         Services
+                    </Link>
+                    <Link href="/boutiques" className="text-sm font-medium hover:text-primary transition-colors">
+                        Boutiques
                     </Link>
                     <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
                         Demander à l'IA
@@ -106,7 +114,11 @@ export function Header() {
                     <Link href="/cart">
                         <Button variant="ghost" size="sm" className="relative">
                             <ShoppingBag className="w-5 h-5" />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full animate-pulse" />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+                                    {totalItems}
+                                </span>
+                            )}
                             <span className="sr-only">Panier</span>
                         </Button>
                     </Link>
