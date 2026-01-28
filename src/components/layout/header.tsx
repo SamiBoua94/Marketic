@@ -175,25 +175,23 @@ export function Header() {
                                         <Store className="w-4 h-4" />
                                         {user.hasShop ? "Gérer ma boutique" : "Ouvrir ma boutique"}
                                     </Link>
+                                    <Link
+                                        href="/orders"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                    >
+                                        <Package className="w-4 h-4" />
+                                        Commande
+                                    </Link>
                                     {user.hasShop && (
-                                        <>
-                                            <Link
-                                                href="/orders"
-                                                onClick={() => setDropdownOpen(false)}
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                            >
-                                                <Package className="w-4 h-4" />
-                                                Commande
-                                            </Link>
-                                            <Link
-                                                href="/support"
-                                                onClick={() => setDropdownOpen(false)}
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                            >
-                                                <Headphones className="w-4 h-4" />
-                                                Support
-                                            </Link>
-                                        </>
+                                        <Link
+                                            href="/support"
+                                            onClick={() => setDropdownOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                        >
+                                            <Headphones className="w-4 h-4" />
+                                            Support
+                                        </Link>
                                     )}
                                     <button
                                         onClick={handleLogout}

@@ -119,12 +119,14 @@ export async function DELETE(request: Request) {
     const cartItemId = searchParams.get('cartItemId');
 
     if (!cartItemId) {
-      return NextResponse.json(
-        { error: 'ID de l\'article manquant' },
-        { status: 400 }
-      );
+      // Si pas de cartItemId, on vide tout le panier
+      console.log(`DELETE /api/cart: Vidange complète du panier pour l'utilisateur ${session.user.id}`);
+      
+      await cartService.clearCart(session.user.id);
+      return NextResponse.json({ success: true, message: 'Panier vidé avec succès' });
     }
 
+    // Sinon, on supprime uniquement l'article spécifié
     console.log(`DELETE /api/cart: Suppression d'article pour l'utilisateur ${session.user.id}`, {
       cartItemId
     });
@@ -132,9 +134,9 @@ export async function DELETE(request: Request) {
     await cartService.removeFromCart(cartItemId, session.user.id);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur lors de la suppression de l\'article:', error);
+    console.error('Erreur lors de la suppression/vidange du panier:', error);
     return NextResponse.json(
-      { error: 'Erreur serveur lors de la suppression de l\'article' },
+      { error: 'Erreur serveur lors de la suppression/vidange du panier' },
       { status: 500 }
     );
   }
