@@ -237,6 +237,19 @@ export function Header() {
                         {/* <Link href="/chat-ia" className="block text-sm font-medium hover:text-primary transition-colors py-2">
                             Demander à l'IA
                         </Link> */}
+                        
+                        {!user && (
+                            <>
+                                <div className="border-t border-secondary/10 pt-3 mt-3 space-y-2">
+                                    <Link href="/login" className="block w-full text-center px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                        Connexion
+                                    </Link>
+                                    <Link href="/login" className="block w-full text-center px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary/10 transition-colors">
+                                        Inscription
+                                    </Link>
+                                </div>
+                            </>
+                        )}
                     </nav>
                 </div>
             )}

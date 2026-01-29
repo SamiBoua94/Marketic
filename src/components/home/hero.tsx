@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Leaf, ShieldCheck } from "lucide-react";
 
@@ -25,12 +26,16 @@ export function Hero() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                    <Button size="lg" className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                        Découvrir les créateurs <ArrowRight className="w-5 h-5" />
-                    </Button>
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                        Vendre mes créations
-                    </Button>
+                    <Link href="/boutiques">
+                        <Button size="lg" className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                            Découvrir les créateurs  <ArrowRight className="w-5 h-5" />
+                        </Button>
+                    </Link>
+                    <Link href="/login">
+                        <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                            Vendre mes créations
+                        </Button>
+                    </Link>
                 </div>
 
             </div>
