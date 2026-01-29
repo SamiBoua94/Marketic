@@ -7,9 +7,9 @@ export async function GET(request: NextRequest) {
     try {
         // Récupérer la session pour identifier l'utilisateur connecté
         const session = await getSession();
-        
+
         // Construire la clause where pour exclure les produits de l'utilisateur connecté
-        const whereClause = session 
+        const whereClause = session
             ? {
                 shop: {
                     NOT: {
@@ -77,6 +77,9 @@ export async function POST(request: NextRequest) {
                 productInfo: data.productInfo ? JSON.stringify(data.productInfo) : null,
                 options: data.options ? JSON.stringify(data.options) : null,
                 category: data.category,
+                ethicalScore: data.ethicalScore !== undefined && data.ethicalScore !== null
+                    ? parseFloat(data.ethicalScore)
+                    : null,
                 shopId: shop.id
             }
         });

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingCart, Store, Star, Heart, Share2, Truck, Shield, Leaf, MessageSquare, ThumbsUp, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 import { useCart } from '@/context/cart-context';
 import { useAuth } from '@/context/auth-context';
 
@@ -133,7 +134,7 @@ export default function ProductDetailPage() {
       }
       const data = await res.json();
       setReviews(data.reviews || []);
-      
+
       // Vérifier si l'utilisateur a déjà donné un avis
       if (user) {
         const existingReview = data.reviews?.find((review: Review) => review.userId === user.id);
@@ -170,10 +171,10 @@ export default function ProductDetailPage() {
       }
 
       const createdReview = await res.json();
-      
+
       if (userReview) {
         // Mettre à jour l'avis existant
-        setReviews(prev => prev.map(review => 
+        setReviews(prev => prev.map(review =>
           review.id === userReview.id ? createdReview : review
         ));
         setUserReview(createdReview);
@@ -205,8 +206,8 @@ export default function ProductDetailPage() {
       }
 
       const data = await res.json();
-      setReviews(prev => prev.map(review => 
-        review.id === reviewId 
+      setReviews(prev => prev.map(review =>
+        review.id === reviewId
           ? { ...review, helpfulCount: data.helpfulCount }
           : review
       ));
@@ -225,9 +226,8 @@ export default function ProductDetailPage() {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`${size} ${
-          i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-        }`}
+        className={`${size} ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+          }`}
       />
     ));
   };
@@ -290,9 +290,8 @@ export default function ProductDetailPage() {
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(url)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === url ? 'border-primary' : 'border-transparent'
-                  }`}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === url ? 'border-primary' : 'border-transparent'
+                    }`}
                 >
                   <img
                     src={url}
@@ -312,7 +311,10 @@ export default function ProductDetailPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">{product.name}</h1>
-            <p className="text-2xl font-bold text-primary">{product.price.toFixed(2)} €</p>
+            <div className="flex items-center gap-4 mb-2">
+              <p className="text-2xl font-bold text-primary">{product.price.toFixed(2)} €</p>
+              <EthicalScoreBadge score={product.ethicalScore} size="md" showLabel />
+            </div>
           </div>
 
           <p className="text-foreground/70 leading-relaxed">{product.description}</p>
@@ -332,7 +334,7 @@ export default function ProductDetailPage() {
             <div className="flex-1">
               <p className="text-sm text-foreground/60">Vendu par</p>
               <Link
-                href={`/shop/${product.shop?.id}`}
+                href={`/boutique/${product.shop?.id}`}
                 className="flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors"
               >
                 <Store size={16} />
@@ -412,7 +414,7 @@ export default function ProductDetailPage() {
                 </span>
               </div>
             </div>
-            
+
             {user && (
               <Button
                 onClick={() => setShowReviewForm(!showReviewForm)}
@@ -442,11 +444,10 @@ export default function ProductDetailPage() {
                         className="p-1"
                       >
                         <Star
-                          className={`w-8 h-8 ${
-                            rating <= newReview.rating
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-300 hover:text-yellow-200'
-                          } transition-colors`}
+                          className={`w-8 h-8 ${rating <= newReview.rating
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-300 hover:text-yellow-200'
+                            } transition-colors`}
                         />
                       </button>
                     ))}
@@ -555,13 +556,13 @@ export default function ProductDetailPage() {
                       </Button>
                     )}
                   </div>
-                  
+
                   {review.comment && (
                     <p className="text-foreground/80 mb-4 leading-relaxed">
                       {review.comment}
                     </p>
                   )}
-                  
+
                   <div className="flex items-center gap-4 pt-4 border-t border-secondary/10">
                     <button
                       onClick={() => handleHelpfulVote(review.id)}

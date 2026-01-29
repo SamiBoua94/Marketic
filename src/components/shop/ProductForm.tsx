@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Camera, Save, X, Trash, Plus, Tag, Leaf, Loader2, Award } from 'lucide-react';
+import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 import {
     EcobalyseProductType,
     EcobalyseFabricProcess,
@@ -308,10 +309,18 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             const method = initialData ? 'PUT' : 'POST';
             const url = initialData ? `/api/products/${initialData.id}` : '/api/products';
 
+            // Inclure le score éthique calculé dans les données
+            const submitData = {
+                ...data,
+                ethicalScore: ecobalyseScore.calculated && ecobalyseScore.ecs !== undefined
+                    ? ecobalyseScore.ecs
+                    : null
+            };
+
             const res = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
+                body: JSON.stringify(submitData),
             });
 
             if (!res.ok) {
@@ -726,10 +735,12 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                         <Award className="text-green-600" size={20} />
                                         Résultats du score environnemental
                                     </h4>
-                                    <div className="flex justify-center">
-                                        <div className="text-center p-4 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-green-100 dark:border-green-900/50 min-w-[150px]">
-                                            <div className="text-3xl font-bold text-emerald-600">{ecobalyseScore.ecs?.toFixed(0) || '-'}</div>
-                                            <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Impact (µPts)</div>
+                                    <div className="flex flex-col items-center gap-3">
+                                        <EthicalScoreBadge score={ecobalyseScore.ecs} size="lg" showLabel />
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-zinc-800 dark:text-zinc-200">
+                                                {ecobalyseScore.ecs?.toFixed(0) || '-'} µPts
+                                            </div>
                                         </div>
                                     </div>
                                     <p className="text-xs text-green-600 dark:text-green-400 mt-3 text-center">

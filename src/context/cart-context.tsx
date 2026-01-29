@@ -14,6 +14,7 @@ export type CartItem = {
         price: number;
         image?: string;
         images?: string[];
+        ethicalScore?: number | null;
     };
 };
 
@@ -47,7 +48,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             const response = await fetch('/api/cart', { credentials: 'include' });
             if (response.ok) {
                 const data = await response.json();
-                console.log("dataCart =",data);
+                console.log("dataCart =", data);
                 setItems(data.items || []);
             }
         } catch (error) {
@@ -85,16 +86,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
             // Rafraîchir le panier après l'ajout
             await fetchCart();
-            
+
             // Déclencher un événement personnalisé pour notifier d'autres composants
             window.dispatchEvent(new Event('cart:updated'));
-            
+
             return { success: true };
         } catch (error: any) {
             console.error('Erreur lors de l\'ajout au panier:', error);
-            return { 
-                success: false, 
-                error: error.message || 'Une erreur est survenue lors de l\'ajout au panier' 
+            return {
+                success: false,
+                error: error.message || 'Une erreur est survenue lors de l\'ajout au panier'
             };
         } finally {
             setIsLoading(false);
@@ -127,13 +128,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
             // Déclencher un événement personnalisé
             window.dispatchEvent(new Event('cart:updated'));
-            
+
             return { success: true };
         } catch (error: any) {
             console.error('Erreur lors de la suppression de l\'article:', error);
-            return { 
-                success: false, 
-                error: error.message || 'Une erreur est survenue lors de la suppression' 
+            return {
+                success: false,
+                error: error.message || 'Une erreur est survenue lors de la suppression'
             };
         } finally {
             setIsLoading(false);
@@ -173,13 +174,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
             // Déclencher un événement personnalisé
             window.dispatchEvent(new Event('cart:updated'));
-            
+
             return { success: true };
         } catch (error: any) {
             console.error('Erreur lors de la mise à jour de la quantité:', error);
-            return { 
-                success: false, 
-                error: error.message || 'Une erreur est survenue lors de la mise à jour' 
+            return {
+                success: false,
+                error: error.message || 'Une erreur est survenue lors de la mise à jour'
             };
         } finally {
             setIsLoading(false);
@@ -205,16 +206,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
             // Mettre à jour l'état local
             setItems([]);
-            
+
             // Déclencher un événement personnalisé
             window.dispatchEvent(new Event('cart:cleared'));
-            
+
             return { success: true };
         } catch (error: any) {
             console.error('Erreur lors de la vidange du panier:', error);
-            return { 
-                success: false, 
-                error: error.message || 'Une erreur est survenue lors de la vidange du panier' 
+            return {
+                success: false,
+                error: error.message || 'Une erreur est survenue lors de la vidange du panier'
             };
         } finally {
             setIsLoading(false);

@@ -27,7 +27,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
+        <html lang="fr" className="scroll-smooth light" data-theme="light" suppressHydrationWarning>
             <body
                 className={`${inter.variable} ${outfit.variable} antialiased min-h-screen flex flex-col font-sans`}
             >

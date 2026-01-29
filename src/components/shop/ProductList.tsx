@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Edit, Trash, Package } from 'lucide-react';
+import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 
 interface Product {
     id: string;
@@ -14,6 +15,7 @@ interface Product {
     tags: string | null;
     productInfo: string | null;
     category: string | null;
+    ethicalScore?: number | null;
 }
 
 interface ProductListProps {
@@ -70,6 +72,10 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                                     <Package size={32} />
                                 </div>
                             )}
+                            {/* Badge score éthique */}
+                            <div className="absolute top-2 left-2">
+                                <EthicalScoreBadge score={product.ethicalScore} size="sm" />
+                            </div>
                             <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
                                     onClick={() => onEdit(product)}

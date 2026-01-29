@@ -36,6 +36,9 @@ export async function PUT(
                 productInfo: data.productInfo ? JSON.stringify(data.productInfo) : undefined,
                 options: data.options ? JSON.stringify(data.options) : undefined,
                 category: data.category,
+                ethicalScore: data.ethicalScore !== undefined
+                    ? (data.ethicalScore !== null ? parseFloat(data.ethicalScore) : null)
+                    : undefined,
             }
         });
 

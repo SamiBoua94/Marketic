@@ -9,6 +9,7 @@ type CartItemWithProduct = {
     id: string;
     name: string;
     price: number;
+    ethicalScore?: number | null;
     // Ajoutez d'autres champs de produit nécessaires
   };
 };
@@ -33,6 +34,7 @@ export const cartService = {
                   name: true,
                   price: true,
                   images: true,
+                  ethicalScore: true,
                   // Ajoutez d'autres champs de produit nécessaires
                 }
               }
@@ -58,6 +60,7 @@ export const cartService = {
                     name: true,
                     price: true,
                     images: true,
+                    ethicalScore: true,
                   }
                 }
               }
@@ -129,7 +132,7 @@ export const cartService = {
     try {
       // Vérifier que l'élément appartient bien à l'utilisateur
       const cartItem = await prisma.cartItem.findFirst({
-        where: { 
+        where: {
           id: cartItemId,
           cart: { userId }
         },
@@ -155,7 +158,7 @@ export const cartService = {
       }
 
       const updatedItem = await prisma.cartItem.update({
-        where: { 
+        where: {
           id: cartItemId,
           cart: { userId } // Double vérification de sécurité
         },
@@ -182,7 +185,7 @@ export const cartService = {
     try {
       // Vérifier que l'élément appartient bien à l'utilisateur avant suppression
       const cartItem = await prisma.cartItem.findFirst({
-        where: { 
+        where: {
           id: cartItemId,
           cart: { userId }
         }
@@ -193,7 +196,7 @@ export const cartService = {
       }
 
       await prisma.cartItem.delete({
-        where: { 
+        where: {
           id: cartItemId,
           cart: { userId } // Double vérification de sécurité
         }

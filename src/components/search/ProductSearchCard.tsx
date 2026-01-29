@@ -1,5 +1,6 @@
 import { Store } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
+import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 import Link from 'next/link';
 
 type ProductSearchCardProduct = {
@@ -9,6 +10,7 @@ type ProductSearchCardProduct = {
     price: number;
     image?: string;
     images?: string | string[] | null;
+    ethicalScore?: number | null;
     shop?: {
         name?: string;
         logo?: string;
@@ -69,6 +71,10 @@ export function ProductSearchCard({ product }: { product: ProductSearchCardProdu
                             e.currentTarget.src = fallbackProductImage;
                         }}
                     />
+                    {/* Badge score éthique */}
+                    <div className="absolute top-2 left-2">
+                        <EthicalScoreBadge score={product.ethicalScore} size="sm" />
+                    </div>
                 </div>
 
                 <div className="p-5 flex flex-col flex-1">

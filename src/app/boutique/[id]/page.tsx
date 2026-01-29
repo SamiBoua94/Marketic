@@ -15,8 +15,12 @@ import {
     Twitter,
     Youtube,
     ShoppingBag,
-    ExternalLink
+    ExternalLink,
+    Heart,
+    UserPlus
 } from 'lucide-react';
+import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
+import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
 interface Product {
     id: string;
@@ -25,6 +29,7 @@ interface Product {
     price: number;
     images?: string | null;
     tags?: string | null;
+    ethicalScore?: number | null;
 }
 
 interface Shop {
@@ -69,41 +74,51 @@ function ProductCard({ product }: { product: Product }) {
     }
 
     return (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:border-emerald-500/50 transition-all duration-300 group">
-            <div className="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                {images.length > 0 ? (
-                    <img
-                        src={images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                        <ShoppingBag size={48} />
+        <Link href={`/product/${product.id}`} className="block group">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:border-emerald-500/50 transition-all duration-300">
+                <div className="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                    {images.length > 0 ? (
+                        <img
+                            src={images[0]}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                            <ShoppingBag size={48} />
+                        </div>
+                    )}
+                    {/* Badge score éthique */}
+                    <div className="absolute top-2 left-2">
+                        <EthicalScoreBadge score={product.ethicalScore} size="sm" />
                     </div>
-                )}
-            </div>
-            <div className="p-4">
-                <h3 className="font-semibold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 transition-colors">
-                    {product.name}
-                </h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                    {product.description}
-                </p>
-                {tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                        {tags.slice(0, 2).map((tag, idx) => (
-                            <span key={idx} className="text-xs px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400">
-                                {tag}
-                            </span>
-                        ))}
+                </div>
+                <div className="p-4">
+                    <h3 className="font-semibold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 transition-colors">
+                        {product.name}
+                    </h3>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                        {product.description}
+                    </p>
+                    {tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                            {tags.slice(0, 2).map((tag, idx) => (
+                                <span key={idx} className="text-xs px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                    <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                        <span className="font-bold text-lg text-emerald-600">{product.price.toFixed(2)} €</span>
                     </div>
-                )}
-                <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
-                    <span className="font-bold text-lg text-emerald-600">{product.price.toFixed(2)} €</span>
+                    {/* Bouton Ajouter au panier */}
+                    <div className="mt-3" onClick={(e) => e.preventDefault()}>
+                        <AddToCartButton productId={product.id} className="w-full" />
+                    </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
 
@@ -112,6 +127,7 @@ export default function BoutiquePage() {
     const [shop, setShop] = useState<Shop | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isFollowing, setIsFollowing] = useState(false);
 
     useEffect(() => {
         const fetchShop = async () => {
@@ -286,10 +302,31 @@ export default function BoutiquePage() {
                                             </a>
                                         )}
                                         {shop.youtube && (
-                                            <a href={shop.youtube} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-red-100 hover:text-red-600 transition-colors">
+                                            <a href={shop.youtube} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 text-zinc-600 hover:bg-red-100 hover:text-red-600 transition-colors">
                                                 <Youtube size={18} />
                                             </a>
                                         )}
+
+                                        {/* Bouton Follow */}
+                                        <button
+                                            onClick={() => setIsFollowing(!isFollowing)}
+                                            className={`ml-2 flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 ${isFollowing
+                                                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                                }`}
+                                        >
+                                            {isFollowing ? (
+                                                <>
+                                                    <Heart size={16} className="fill-emerald-600 text-emerald-600" />
+                                                    Suivi
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserPlus size={16} />
+                                                    Suivre
+                                                </>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

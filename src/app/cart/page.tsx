@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/cart-context';
 import { useAuth } from '@/context/auth-context';
 import { Badge } from '@/components/ui/badge';
+import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 
 function normalizeImageUrls(images: unknown): string[] {
     if (Array.isArray(images)) {
@@ -114,10 +115,10 @@ export default function CartPage() {
 
             const order = await response.json();
             console.log('Commande créée:', order);
-            
+
             // Vider le panier
             await clearCart();
-            
+
             // Afficher le succès
             setOrderSuccess(true);
             setShowCheckoutForm(false);
@@ -244,71 +245,74 @@ export default function CartPage() {
                                 fallbackProductImage;
 
                             return (
-                        <div
-                            key={item.id}
-                            className="flex gap-4 sm:gap-6 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-secondary/10 shadow-sm hover:shadow-md transition-shadow group"
-                        >
-                            {/* Product Image */}
-                            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-secondary/5 flex-shrink-0">
-                                <img
-                                    src={productImage}
-                                    alt={item.product.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    onError={(e) => {
-                                        e.currentTarget.src = fallbackProductImage;
-                                    }}
-                                />
-                            </div>
-
-                            {/* Item Info */}
-                            <div className="flex-1 flex flex-col justify-between py-1">
-                                <div className="flex justify-between items-start gap-4">
-                                    <div>
-                                        <h3 className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
-                                            {item.product.name}
-                                        </h3>
-                                        <p className="text-sm text-foreground/50">Production artisanale</p>
+                                <div
+                                    key={item.id}
+                                    className="flex gap-4 sm:gap-6 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-secondary/10 shadow-sm hover:shadow-md transition-shadow group"
+                                >
+                                    {/* Product Image */}
+                                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-secondary/5 flex-shrink-0">
+                                        <img
+                                            src={productImage}
+                                            alt={item.product.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => {
+                                                e.currentTarget.src = fallbackProductImage;
+                                            }}
+                                        />
                                     </div>
-                                    <button
-                                        onClick={() => removeItem(item.id)}
-                                        className="p-2 text-foreground/30 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
-                                        title="Supprimer l'article"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
+
+                                    {/* Item Info */}
+                                    <div className="flex-1 flex flex-col justify-between py-1">
+                                        <div className="flex justify-between items-start gap-4">
+                                            <div>
+                                                <h3 className="font-heading font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                                                    {item.product.name}
+                                                </h3>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm text-foreground/50">Production artisanale</p>
+                                                    <EthicalScoreBadge score={(item.product as any).ethicalScore} size="sm" />
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => removeItem(item.id)}
+                                                className="p-2 text-foreground/30 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                                title="Supprimer l'article"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex flex-wrap items-end justify-between gap-4 mt-4">
+                                            {/* Quantity Controller */}
+                                            <div className="flex items-center gap-1 bg-secondary/10 rounded-lg p-1">
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
+                                                    disabled={isLoading}
+                                                >
+                                                    <Minus className="w-4 h-4" />
+                                                </button>
+                                                <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
+                                                    disabled={isLoading}
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                            </div>
+
+                                            <div className="text-right">
+                                                <span className="text-xl font-bold text-primary">
+                                                    {(item.product.price * item.quantity).toFixed(2)} €
+                                                </span>
+                                                {item.quantity > 1 && (
+                                                    <p className="text-xs text-foreground/40">{item.product.price.toFixed(2)} € / unité</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div className="flex flex-wrap items-end justify-between gap-4 mt-4">
-                                    {/* Quantity Controller */}
-                                    <div className="flex items-center gap-1 bg-secondary/10 rounded-lg p-1">
-                                        <button
-                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                            className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
-                                            disabled={isLoading}
-                                        >
-                                            <Minus className="w-4 h-4" />
-                                        </button>
-                                        <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
-                                        <button
-                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                            className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
-                                            disabled={isLoading}
-                                        >
-                                            <Plus className="w-4 h-4" />
-                                        </button>
-                                    </div>
-
-                                    <div className="text-right">
-                                        <span className="text-xl font-bold text-primary">
-                                            {(item.product.price * item.quantity).toFixed(2)} €
-                                        </span>
-                                        {item.quantity > 1 && (
-                                            <p className="text-xs text-foreground/40">{item.product.price.toFixed(2)} € / unité</p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                             );
                         })()
                     ))}
@@ -356,50 +360,45 @@ export default function CartPage() {
                                 {/* Progress Steps */}
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                            checkoutStep === 'shipping' ? 'bg-primary text-white' : 
-                                            checkoutStep === 'payment' || checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
-                                        }`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${checkoutStep === 'shipping' ? 'bg-primary text-white' :
+                                                checkoutStep === 'payment' || checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                            }`}>
                                             {checkoutStep === 'shipping' ? '1' : checkoutStep === 'payment' || checkoutStep === 'review' ? '✓' : '1'}
                                         </div>
                                         <span className="ml-2 text-sm font-medium">Livraison</span>
                                     </div>
-                                    <div className={`flex-1 h-1 mx-4 ${
-                                        checkoutStep === 'payment' || checkoutStep === 'review' ? 'bg-green-500' : 'bg-gray-200'
-                                    }`} />
+                                    <div className={`flex-1 h-1 mx-4 ${checkoutStep === 'payment' || checkoutStep === 'review' ? 'bg-green-500' : 'bg-gray-200'
+                                        }`} />
                                     <div className="flex items-center">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                            checkoutStep === 'payment' ? 'bg-primary text-white' : 
-                                            checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
-                                        }`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${checkoutStep === 'payment' ? 'bg-primary text-white' :
+                                                checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                            }`}>
                                             {checkoutStep === 'payment' ? '2' : checkoutStep === 'review' ? '✓' : '2'}
                                         </div>
                                         <span className="ml-2 text-sm font-medium">Paiement</span>
                                     </div>
-                                    <div className={`flex-1 h-1 mx-4 ${
-                                        checkoutStep === 'review' ? 'bg-green-500' : 'bg-gray-200'
-                                    }`} />
+                                    <div className={`flex-1 h-1 mx-4 ${checkoutStep === 'review' ? 'bg-green-500' : 'bg-gray-200'
+                                        }`} />
                                     <div className="flex items-center">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                            checkoutStep === 'review' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
-                                        }`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${checkoutStep === 'review' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
+                                            }`}>
                                             {checkoutStep === 'review' ? '3' : '3'}
                                         </div>
                                         <span className="ml-2 text-sm font-medium">Confirmation</span>
                                     </div>
                                 </div>
-                                
+
                                 {orderError && (
                                     <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
                                         {orderError}
                                     </div>
                                 )}
-                                
+
                                 {/* Step 1: Shipping */}
                                 {checkoutStep === 'shipping' && (
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-foreground mb-4">Adresse de livraison</h3>
-                                        
+
                                         <div className="space-y-3">
                                             <div className="flex gap-3">
                                                 <div className="flex-1">
@@ -429,7 +428,7 @@ export default function CartPage() {
                                                     />
                                                 </div>
                                             </div>
-                                            
+
                                             <div>
                                                 <label className="flex items-center gap-2 text-sm font-medium text-foreground/70 mb-1">
                                                     <MapPin className="w-4 h-4" />
@@ -443,7 +442,7 @@ export default function CartPage() {
                                                     placeholder="Rue et numéro"
                                                 />
                                             </div>
-                                            
+
                                             <div className="flex gap-3">
                                                 <div className="flex-1">
                                                     <label className="text-sm font-medium text-foreground/70 mb-1 block">Ville</label>
@@ -466,7 +465,7 @@ export default function CartPage() {
                                                     />
                                                 </div>
                                             </div>
-                                            
+
                                             <div>
                                                 <label className="text-sm font-medium text-foreground/70 mb-1 block">Instructions (optionnel)</label>
                                                 <textarea
@@ -480,19 +479,19 @@ export default function CartPage() {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {/* Step 2: Payment */}
                                 {checkoutStep === 'payment' && (
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-foreground mb-4">Informations de paiement</h3>
-                                        
+
                                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                                             <div className="flex items-center gap-2 text-blue-700">
                                                 <Lock className="w-4 h-4" />
                                                 <span className="text-sm">Paiement sécurisé via cryptage SSL</span>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="space-y-3">
                                             <div>
                                                 <label className="text-sm font-medium text-foreground/70 mb-1 block">Numéro de carte</label>
@@ -505,7 +504,7 @@ export default function CartPage() {
                                                     maxLength={19}
                                                 />
                                             </div>
-                                            
+
                                             <div>
                                                 <label className="text-sm font-medium text-foreground/70 mb-1 block">Nom sur la carte</label>
                                                 <input
@@ -516,7 +515,7 @@ export default function CartPage() {
                                                     placeholder="NOM COMPLET"
                                                 />
                                             </div>
-                                            
+
                                             <div className="flex gap-3">
                                                 <div className="flex-1">
                                                     <label className="text-sm font-medium text-foreground/70 mb-1 block">Date d'expiration</label>
@@ -541,7 +540,7 @@ export default function CartPage() {
                                                     />
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="checkbox"
@@ -555,19 +554,19 @@ export default function CartPage() {
                                                 </label>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex gap-2 text-xs text-foreground/50">
                                             <CreditCard className="w-4 h-4" />
                                             <span>Nous acceptons Visa, Mastercard, American Express</span>
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {/* Step 3: Review */}
                                 {checkoutStep === 'review' && (
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-foreground mb-4">Récapitulatif de la commande</h3>
-                                        
+
                                         <div className="bg-secondary/5 rounded-lg p-4 space-y-3">
                                             <div>
                                                 <h4 className="font-medium text-sm text-foreground/70 mb-2">Adresse de livraison</h4>
@@ -579,13 +578,13 @@ export default function CartPage() {
                                                     <p className="text-sm text-foreground/60">Instructions: {shippingInfo.instructions}</p>
                                                 )}
                                             </div>
-                                            
+
                                             <div className="border-t border-secondary/20 pt-3">
                                                 <h4 className="font-medium text-sm text-foreground/70 mb-2">Moyen de paiement</h4>
                                                 <p className="text-sm">Carte se terminant par {paymentInfo.cardNumber.slice(-4)}</p>
                                                 <p className="text-sm">{paymentInfo.cardName}</p>
                                             </div>
-                                            
+
                                             <div className="border-t border-secondary/20 pt-3">
                                                 <div className="flex justify-between text-sm">
                                                     <span>Sous-total</span>
@@ -601,7 +600,7 @@ export default function CartPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                                             <div className="flex items-center gap-2 text-green-700">
                                                 <CheckCircle className="w-4 h-4" />
@@ -610,7 +609,7 @@ export default function CartPage() {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {/* Navigation Buttons */}
                                 <div className="flex gap-3 pt-4">
                                     {checkoutStep !== 'shipping' && (
@@ -625,24 +624,24 @@ export default function CartPage() {
                                             Retour
                                         </Button>
                                     )}
-                                    
+
                                     <Button
                                         onClick={handleCheckout}
                                         disabled={isCheckingOut}
                                         className="flex-1"
                                     >
-                                        {isCheckingOut ? 'Traitement...' : 
-                                         checkoutStep === 'shipping' ? 'Continuer vers le paiement' :
-                                         checkoutStep === 'payment' ? 'Vérifier la commande' :
-                                         'Confirmer et payer'}
+                                        {isCheckingOut ? 'Traitement...' :
+                                            checkoutStep === 'shipping' ? 'Continuer vers le paiement' :
+                                                checkoutStep === 'payment' ? 'Vérifier la commande' :
+                                                    'Confirmer et payer'}
                                     </Button>
                                 </div>
                             </div>
                         ) : (
-                            <Button 
+                            <Button
                                 onClick={() => setShowCheckoutForm(true)}
-                                variant="primary" 
-                                size="lg" 
+                                variant="primary"
+                                size="lg"
                                 className="w-full h-16 text-lg group"
                             >
                                 Valider la commande
