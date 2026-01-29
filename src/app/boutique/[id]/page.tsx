@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
-import { FollowButton } from '@/components/FollowButton';
+import { ShopFollowButton } from '@/components/ShopFollowButton';
 import { useAuth } from '@/context/auth-context';
 
 interface Product {
@@ -133,6 +133,19 @@ export default function BoutiquePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFollowing, setIsFollowing] = useState(false);
+
+    const handleFollowChange = (newFollowState: boolean, increment: number) => {
+        setIsFollowing(newFollowState);
+        if (shop) {
+            setShop(prev => prev ? {
+                ...prev,
+                _count: {
+                    ...prev._count,
+                    follows: Math.max(0, (prev._count?.follows || 0) + increment)
+                }
+            } : null);
+        }
+    };
 
     useEffect(() => {
         const fetchShop = async () => {
@@ -338,9 +351,10 @@ export default function BoutiquePage() {
 
                                         {/* Bouton Follow */}
                                         <div className="flex items-center gap-3">
-                                            <FollowButton
+                                            <ShopFollowButton
                                                 shopId={shop.id}
                                                 initialIsFollowing={isFollowing}
+                                                onFollowChange={handleFollowChange}
                                                 size="sm"
                                                 variant="primary"
                                             />

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Shop {
   id: string;
@@ -16,6 +17,7 @@ interface Shop {
 }
 
 export default function BoutiquesPage() {
+  const router = useRouter();
   const [shops, setShops] = useState<Shop[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -172,37 +174,20 @@ export default function BoutiquesPage() {
             padding: '0 0.5rem'
           }}>
             {shops.map((shop) => (
-              <Link
+              <div
                 key={shop.id}
-                href={`/boutique/${shop.id}`}
                 style={{
-                  textDecoration: 'none',
-                  color: 'inherit'
+                  border: '1px solid var(--border)',
+                  borderRadius: '0.75rem',
+                  overflow: 'hidden',
+                  backgroundColor: 'var(--card)',
+                  color: 'var(--card-foreground)',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.05)'
                 }}
               >
-                <div
-                  style={{
-                    border: '1px solid var(--border)',
-                    borderRadius: '0.75rem',
-                    overflow: 'hidden',
-                    backgroundColor: 'var(--card)',
-                    color: 'var(--card-foreground)',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.05)'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)';
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.boxShadow = '0 2px 4px 0 rgba(0, 0, 0, 0.05)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
                   <div style={{
                     height: '12rem',
                     backgroundColor: 'var(--muted)',
@@ -327,13 +312,15 @@ export default function BoutiquesPage() {
                       </div>
                     </div>
                     <button
+                      type="button"
+                      onClick={() => router.push(`/boutique/${shop.id}`)}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: '0.5rem',
-                        backgroundColor: 'var(--primary)',
-                        color: 'var(--primary-foreground)',
+                        backgroundColor: '#3a5a40',
+                        color: '#ffffff',
                         fontWeight: 500,
                         fontSize: '0.9375rem',
                         lineHeight: '1.5',
@@ -342,21 +329,27 @@ export default function BoutiquesPage() {
                         border: 'none',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        marginTop: 'auto'
+                        marginTop: 'auto',
+                        outline: 'none',
+                        boxShadow: 'none'
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                        e.currentTarget.style.backgroundColor = '#2d4533';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--primary)';
+                        e.currentTarget.style.backgroundColor = '#3a5a40';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
-                      onMouseDown={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
+                      onFocus={(e) => {
+                        e.currentTarget.style.backgroundColor = '#3a5a40';
+                        e.currentTarget.style.outline = 'none';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
-                      onTouchStart={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
+                      onBlur={(e) => {
+                        e.currentTarget.style.backgroundColor = '#3a5a40';
+                        e.currentTarget.style.outline = 'none';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       <span>Voir la boutique</span>
@@ -367,7 +360,6 @@ export default function BoutiquesPage() {
                     </button>
                   </div>
                 </div>
-              </Link>
             ))}
           </div>
         )}
