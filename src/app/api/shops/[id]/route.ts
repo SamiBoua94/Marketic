@@ -14,9 +14,29 @@ export async function GET(
         const shop = await prisma.shop.findUnique({
             where: { id },
             include: {
-                user: { select: { name: true, profilePicture: true } },
+                user: { 
+                    select: { 
+                        id: true,
+                        name: true, 
+                        profilePicture: true 
+                    } 
+                },
                 products: {
-                    orderBy: { createdAt: 'desc' }
+                    orderBy: { createdAt: 'desc' },
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        price: true,
+                        images: true,
+                        tags: true,
+                        ethicalScore: true
+                    }
+                },
+                _count: {
+                    select: {
+                        follows: true
+                    }
                 }
             }
         });

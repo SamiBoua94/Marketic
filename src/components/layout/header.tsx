@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare, BarChart3 } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare, BarChart3, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { useCart } from '@/context/cart-context';
@@ -167,6 +167,14 @@ export function Header() {
                                     >
                                         <MessageSquare className="w-4 h-4" />
                                         Messagerie
+                                    </Link>
+                                    <Link
+                                        href="/follows"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                    >
+                                        <Heart className="w-4 h-4" />
+                                        Mes boutiques suivies
                                     </Link>
                                     <Link
                                         href="/shop"

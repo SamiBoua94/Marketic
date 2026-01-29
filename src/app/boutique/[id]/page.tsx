@@ -16,11 +16,12 @@ import {
     Youtube,
     ShoppingBag,
     ExternalLink,
-    Heart,
-    UserPlus
+    Users
 } from 'lucide-react';
 import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
+import { FollowButton } from '@/components/FollowButton';
+import { useAuth } from '@/context/auth-context';
 
 interface Product {
     id: string;
@@ -52,6 +53,9 @@ interface Shop {
     certificationPicture?: string | null;
     user?: { name?: string; profilePicture?: string | null };
     products?: Product[];
+    _count?: {
+        follows: number;
+    };
 }
 
 function ProductCard({ product }: { product: Product }) {
@@ -124,6 +128,7 @@ function ProductCard({ product }: { product: Product }) {
 
 export default function BoutiquePage() {
     const params = useParams();
+    const { user } = useAuth();
     const [shop, setShop] = useState<Shop | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -151,10 +156,28 @@ export default function BoutiquePage() {
             }
         };
 
+        const checkFollowStatus = async () => {
+            if (!user || !params.id) return;
+            
+            try {
+                const res = await fetch(`/api/shops/${params.id}/follow-status`, {
+                    credentials: 'include'
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    setIsFollowing(data.isFollowing);
+                }
+            } catch (err) {
+                // Silently fail - user might not be following
+            }
+        };
+
         if (params.id) {
             fetchShop();
+            checkFollowStatus();
         }
-    }, [params.id]);
+    }, [params.id, user]);
 
     // Parse tags
     let parsedTags: string[] = [];
@@ -243,11 +266,17 @@ export default function BoutiquePage() {
                                 </h1>
 
                                 {shop.city && (
-                                    <div className="flex items-center gap-2 text-zinc-500 mb-4">
+                                    <div className="flex items-center gap-2 text-zinc-500 mb-2">
                                         <MapPin className="w-4 h-4" />
                                         <span>{shop.city}{shop.postalCode ? `, ${shop.postalCode}` : ''}</span>
                                     </div>
                                 )}
+
+                                {/* Followers count */}
+                                <div className="flex items-center gap-2 text-zinc-500 mb-4">
+                                    <Users className="w-4 h-4" />
+                                    <span>{shop._count?.follows || 0} follower{shop._count?.follows !== 1 ? 's' : ''}</span>
+                                </div>
 
                                 {shop.description && (
                                     <p className="text-zinc-600 mb-4 max-w-2xl">
@@ -308,25 +337,18 @@ export default function BoutiquePage() {
                                         )}
 
                                         {/* Bouton Follow */}
-                                        <button
-                                            onClick={() => setIsFollowing(!isFollowing)}
-                                            className={`ml-2 flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 ${isFollowing
-                                                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
-                                                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                                                }`}
-                                        >
-                                            {isFollowing ? (
-                                                <>
-                                                    <Heart size={16} className="fill-emerald-600 text-emerald-600" />
-                                                    Suivi
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <UserPlus size={16} />
-                                                    Suivre
-                                                </>
-                                            )}
-                                        </button>
+                                        <div className="flex items-center gap-3">
+                                            <FollowButton
+                                                shopId={shop.id}
+                                                initialIsFollowing={isFollowing}
+                                                size="sm"
+                                                variant="primary"
+                                            />
+                                            <div className="flex items-center gap-1 text-sm text-zinc-600">
+                                                <Users size={16} />
+                                                <span>{shop._count?.follows || 0}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
