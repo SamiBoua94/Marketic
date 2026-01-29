@@ -14,6 +14,7 @@ export function Header() {
     const { totalItems } = useCart();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -82,9 +83,9 @@ export function Header() {
                     <Link href="/boutiques" className="text-sm font-medium hover:text-primary transition-colors">
                         Boutiques
                     </Link>
-                    <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
+                    {/* <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
                         Demander à l'IA
-                    </Link>
+                    </Link> */}
                 </nav>
 
                 {/* Actions */}
@@ -211,11 +212,34 @@ export function Header() {
                         </Link>
                     )}
 
-                    <Button variant="ghost" size="sm" className="md:hidden">
+                    <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                         <Menu className="w-5 h-5" />
                     </Button>
                 </div>
             </div>
+
+            {/* Mobile Menu */}
+            {mobileMenuOpen && (
+                <div className="md:hidden border-t border-secondary/20 bg-background/95 backdrop-blur-md">
+                    <nav className="container mx-auto px-4 py-4 space-y-3">
+                        <Link href="/about" className="block text-sm font-medium hover:text-primary transition-colors py-2">
+                            Notre Mission
+                        </Link>
+                        <Link href="/products" className="block text-sm font-medium hover:text-primary transition-colors py-2">
+                            Catalogue
+                        </Link>
+                        <Link href="/services" className="block text-sm font-medium hover:text-primary transition-colors py-2">
+                            Services
+                        </Link>
+                        <Link href="/boutiques" className="block text-sm font-medium hover:text-primary transition-colors py-2">
+                            Boutiques
+                        </Link>
+                        {/* <Link href="/chat-ia" className="block text-sm font-medium hover:text-primary transition-colors py-2">
+                            Demander à l'IA
+                        </Link> */}
+                    </nav>
+                </div>
+            )}
         </header>
     );
 }
