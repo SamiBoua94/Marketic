@@ -43,22 +43,7 @@
   --radius: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0D1F12;
-    /* Very dark green */
-    --foreground: #FDFCF8;
-
-    --primary: #588157;
-    --primary-foreground: #FFFFFF;
-
-    --secondary: #344E41;
-    --secondary-foreground: #DAD7CD;
-
-    --accent: #D4A373;
-    --accent-foreground: #1A2E1A;
-  }
-}
+/* Dark mode removed - light theme only */
 
 body {
   background-color: var(--background);

@@ -213,7 +213,7 @@ export default function OrdersPage() {
                         return (
                             <div
                                 key={order.id}
-                                className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:shadow-md transition-shadow"
+                                className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden hover:shadow-md transition-shadow"
                             >
                                 <div className="p-6">
                                     {/* Header */}
@@ -301,7 +301,7 @@ export default function OrdersPage() {
             {/* Order Details Modal */}
             {selectedOrder && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-6">
                                 <div>

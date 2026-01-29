@@ -103,7 +103,7 @@ function SearchContent() {
         <div>
             {/* Results header */}
             <div className="mb-8">
-                <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">
                     Résultats pour "{query}"
                 </h1>
                 <p className="text-zinc-500">
@@ -112,9 +112,9 @@ function SearchContent() {
             </div>
 
             {totalResults === 0 ? (
-                <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                <div className="text-center py-16 bg-white rounded-xl border border-zinc-200">
                     <SearchX size={48} className="mx-auto mb-4 text-zinc-300" />
-                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">Aucun résultat</h2>
+                    <h2 className="text-xl font-semibold text-zinc-900 mb-2">Aucun résultat</h2>
                     <p className="text-zinc-500 max-w-md mx-auto">
                         Nous n'avons trouvé aucun résultat pour "{query}". Essayez avec d'autres mots-clés.
                     </p>
@@ -122,7 +122,7 @@ function SearchContent() {
             ) : (
                 <>
                     {/* Tabs */}
-                    <div className="flex gap-2 mb-6 border-b border-zinc-200 dark:border-zinc-800">
+                    <div className="flex gap-2 mb-6 border-b border-zinc-200">
                         <button
                             onClick={() => setActiveTab('all')}
                             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'all'
@@ -158,7 +158,7 @@ function SearchContent() {
                             {activeTab === 'all' && (
                                 <div className="flex items-center gap-2 mb-4">
                                     <Store className="w-5 h-5 text-emerald-600" />
-                                    <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Boutiques</h2>
+                                    <h2 className="text-lg font-semibold text-zinc-900">Boutiques</h2>
                                 </div>
                             )}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -175,7 +175,7 @@ function SearchContent() {
                             {activeTab === 'all' && (
                                 <div className="flex items-center gap-2 mb-4">
                                     <ShoppingBag className="w-5 h-5 text-emerald-600" />
-                                    <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Produits</h2>
+                                    <h2 className="text-lg font-semibold text-zinc-900">Produits</h2>
                                 </div>
                             )}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -193,7 +193,7 @@ function SearchContent() {
 
 export default function RecherchePage() {
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <div className="min-h-screen bg-zinc-50">
             <div className="container mx-auto px-4 py-8">
                 {/* Back link */}
                 <Link

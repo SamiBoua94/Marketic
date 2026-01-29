@@ -66,24 +66,24 @@ export default function ShopPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50">
                 <Loader2 className="animate-spin text-blue-600" size={32} />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
+                            <h1 className="text-3xl font-bold text-zinc-900 flex items-center gap-3">
                                 <Store className="text-blue-600" />
                                 Espace Boutique
                             </h1>
-                            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+                            <p className="mt-2 text-zinc-600">
                                 {shop
                                     ? "Gérez les informations de votre boutique, votre catalogue et vos préférences."
                                     : "Créez votre boutique professionnelle en quelques minutes."}
@@ -93,10 +93,10 @@ export default function ShopPage() {
                         {shop && (
                             <Link 
                                 href="/shop/orders"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors group"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors group"
                             >
-                                <Package className="w-4 h-4 text-zinc-600 dark:text-zinc-400 group-hover:text-blue-600" />
-                                <span className="text-zinc-700 dark:text-zinc-300 group-hover:text-blue-600 font-medium">
+                                <Package className="w-4 h-4 text-zinc-600 group-hover:text-blue-600" />
+                                <span className="text-zinc-700 group-hover:text-blue-600 font-medium">
                                     Mes commandes
                                 </span>
                                 <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
@@ -114,9 +114,9 @@ export default function ShopPage() {
 
                 {/* Product Management Section (Only if shop exists) */}
                 {shop && (
-                    <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-8">
+                    <div className="bg-white rounded-xl shadow-lg border border-zinc-200 p-8">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Mes Articles</h2>
+                            <h2 className="text-2xl font-bold text-zinc-900">Mes Articles</h2>
                             <button
                                 onClick={() => {
                                     setEditingProduct(null);

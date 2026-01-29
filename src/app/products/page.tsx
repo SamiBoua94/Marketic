@@ -95,7 +95,7 @@ export default function ProductsPage() {
                                         placeholder="Nom, artisan, matière..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-900 border border-secondary/20 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans text-sm"
+                                        className="w-full pl-10 pr-4 py-3 bg-white border border-secondary/20 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans text-sm"
                                     />
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
                                     {searchQuery && (
@@ -153,7 +153,7 @@ export default function ProductsPage() {
                             </p>
 
                             <div className="flex items-center gap-2 bg-secondary/5 p-1 rounded-lg">
-                                <button className="p-2 bg-white dark:bg-zinc-800 shadow-sm rounded-md text-primary">
+                                <button className="p-2 bg-white shadow-sm rounded-md text-primary">
                                     <LayoutGrid size={18} />
                                 </button>
                                 <button className="p-2 text-foreground/40 hover:text-foreground/70 transition-colors">
@@ -191,7 +191,7 @@ export default function ProductsPage() {
                             </div>
                         ) : (
                             <div className="py-24 text-center bg-secondary/5 rounded-3xl border border-dashed border-secondary/20">
-                                <div className="inline-flex p-6 bg-white dark:bg-zinc-800 rounded-full mb-6 text-foreground/20">
+                                <div className="inline-flex p-6 bg-white rounded-full mb-6 text-foreground/20">
                                     <Search size={48} />
                                 </div>
                                 <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Aucun résultat</h2>

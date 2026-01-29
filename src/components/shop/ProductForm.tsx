@@ -337,12 +337,12 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-6 max-h-[90vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border border-zinc-200 p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                <h2 className="text-xl font-bold text-zinc-900">
                     {initialData ? 'Modifier l\'article' : 'Ajouter un article'}
                 </h2>
-                <button type="button" onClick={onCancel} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+                <button type="button" onClick={onCancel} className="text-zinc-500 hover:text-zinc-700">
                     <X size={24} />
                 </button>
             </div>
@@ -350,10 +350,10 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             <div className="space-y-6">
                 {/* Images Section */}
                 <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Photos du produit</label>
+                    <label className="text-sm font-medium text-zinc-700 mb-2 block">Photos du produit</label>
                     <div className="flex flex-wrap gap-4">
                         {data.images?.map((img, index) => (
-                            <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 group">
+                            <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-200 group">
                                 <img src={img} alt={`Produit ${index + 1}`} className="w-full h-full object-cover" />
                                 <button
                                     type="button"
@@ -367,7 +367,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-24 h-24 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center text-zinc-400 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
+                            className="w-24 h-24 rounded-lg border-2 border-dashed border-zinc-300 flex flex-col items-center justify-center text-zinc-400 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
                         >
                             <Camera size={24} />
                             <span className="text-xs mt-1">Ajouter</span>
@@ -384,12 +384,12 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
 
                 {/* Name */}
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nom de l'article</label>
+                    <label className="text-sm font-medium text-zinc-700">Nom de l'article</label>
                     <input
                         type="text"
                         value={data.name}
                         onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
+                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
                         placeholder="Ex: Vase en céramique bleue"
                         required
                     />
@@ -398,23 +398,23 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                 {/* Price & Stock */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Prix (€)</label>
+                        <label className="text-sm font-medium text-zinc-700">Prix (€)</label>
                         <input
                             type="number"
                             step="0.01"
                             value={data.price}
                             onChange={(e) => setData(prev => ({ ...prev, price: e.target.value }))}
-                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
+                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
                             required
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Stock</label>
+                        <label className="text-sm font-medium text-zinc-700">Stock</label>
                         <input
                             type="number"
                             value={data.stock}
                             onChange={(e) => setData(prev => ({ ...prev, stock: e.target.value }))}
-                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
+                            className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
                             required
                         />
                     </div>
@@ -422,12 +422,12 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
 
                 {/* Tags */}
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags</label>
+                    <label className="text-sm font-medium text-zinc-700">Tags</label>
                     <div className="flex flex-wrap gap-2 mb-2">
                         {data.tags?.map((tag, index) => (
-                            <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-sm">
+                            <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm">
                                 {tag}
-                                <button type="button" onClick={() => removeTag(tag)} className="hover:text-emerald-900 dark:hover:text-emerald-200">
+                                <button type="button" onClick={() => removeTag(tag)} className="hover:text-emerald-900">
                                     <X size={14} />
                                 </button>
                             </span>
@@ -441,17 +441,17 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                             onChange={(e) => setNewTag(e.target.value)}
                             onKeyDown={addTag}
                             placeholder="Ajouter un tag (Entrée)"
-                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none"
                         />
                     </div>
                 </div>
 
                 {/* Options Section */}
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Options (couleur, taille, etc.)</label>
+                    <label className="text-sm font-medium text-zinc-700">Options (couleur, taille, etc.)</label>
                     <div className="space-y-3">
                         {data.options?.map((option, optIndex) => (
-                            <div key={optIndex} className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                            <div key={optIndex} className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
                                 <div className="flex items-center gap-2 mb-2">
                                     <input
                                         type="text"
@@ -462,19 +462,19 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                             setData(prev => ({ ...prev, options: newOptions }));
                                         }}
                                         placeholder="Nom de l'option (ex: Couleur)"
-                                        className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 outline-none focus:ring-2 focus:ring-emerald-500"
+                                        className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-zinc-200 bg-white outline-none focus:ring-2 focus:ring-emerald-500"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setData(prev => ({ ...prev, options: prev.options?.filter((_, i) => i !== optIndex) }))}
-                                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                        className="p-1.5 text-red-500 hover:bg-red-50 rounded"
                                     >
                                         <Trash size={14} />
                                     </button>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {option.values.map((val, valIndex) => (
-                                        <span key={valIndex} className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-200 dark:bg-zinc-700 rounded text-xs">
+                                        <span key={valIndex} className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-200 rounded text-xs">
                                             {val}
                                             <button type="button" onClick={() => {
                                                 const newOptions = [...(data.options || [])];
@@ -488,7 +488,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                     <input
                                         type="text"
                                         placeholder="+ valeur"
-                                        className="px-2 py-1 text-xs border border-dashed border-zinc-300 dark:border-zinc-600 rounded bg-transparent outline-none w-20"
+                                        className="px-2 py-1 text-xs border border-dashed border-zinc-300 rounded bg-transparent outline-none w-20"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 e.preventDefault();
@@ -508,7 +508,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                         <button
                             type="button"
                             onClick={() => setData(prev => ({ ...prev, options: [...(prev.options || []), { name: '', values: [] }] }))}
-                            className="w-full py-2 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-500 hover:border-emerald-500 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 text-sm"
+                            className="w-full py-2 border-2 border-dashed border-zinc-300 rounded-lg text-zinc-500 hover:border-emerald-500 hover:text-emerald-500 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
                             <Plus size={16} /> Ajouter une option
                         </button>
@@ -517,38 +517,38 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
 
                 {/* Description */}
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</label>
+                    <label className="text-sm font-medium text-zinc-700">Description</label>
                     <textarea
                         value={data.description}
                         onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none min-h-[100px]"
+                        className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-emerald-500 outline-none min-h-[100px]"
                         placeholder="Décrivez votre produit..."
                         required
                     />
                 </div>
 
                 {/* Score Environnemental Section */}
-                <div className="border-t border-zinc-200 dark:border-zinc-800 pt-6">
+                <div className="border-t border-zinc-200 pt-6">
                     <button
                         type="button"
                         onClick={() => setShowProductInfo(!showProductInfo)}
-                        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/30 dark:hover:to-emerald-900/30 transition-colors border border-green-200 dark:border-green-800"
+                        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:from-green-100 hover:to-emerald-100 transition-colors border border-green-200"
                     >
                         <div className="flex items-center gap-3">
                             <Leaf className="text-green-600" size={24} />
                             <div className="text-left">
-                                <span className="font-semibold block text-green-800 dark:text-green-200">Score Environnemental</span>
-                                <span className="text-xs text-green-600 dark:text-green-400">Calculez l'impact de votre produit textile</span>
+                                <span className="font-semibold block text-green-800">Score Environnemental</span>
+                                <span className="text-xs text-green-600">Calculez l'impact de votre produit textile</span>
                             </div>
                         </div>
                         <Plus className={`text-green-600 transition-transform ${showProductInfo ? 'rotate-45' : ''}`} />
                     </button>
 
                     {showProductInfo && (
-                        <div className="mt-4 space-y-4 p-4 border border-green-200 dark:border-green-800 rounded-xl bg-green-50/50 dark:bg-green-900/10">
+                        <div className="mt-4 space-y-4 p-4 border border-green-200 rounded-xl bg-green-50/50">
 
                             {/* Produit remanufacturé (upcycled) */}
-                            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -560,8 +560,8 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                         className="w-5 h-5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
                                     />
                                     <div>
-                                        <span className="font-medium text-amber-800 dark:text-amber-200">Produit remanufacturé / upcyclé</span>
-                                        <p className="text-xs text-amber-600 dark:text-amber-400">Cochez si le produit est fabriqué à partir de matériaux recyclés (réduit l'impact)</p>
+                                        <span className="font-medium text-amber-800">Produit remanufacturé / upcyclé</span>
+                                        <p className="text-xs text-amber-600">Cochez si le produit est fabriqué à partir de matériaux recyclés (réduit l'impact)</p>
                                     </div>
                                 </label>
                             </div>
@@ -569,14 +569,14 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                             {/* Type de produit */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Type de produit textile *</label>
+                                    <label className="text-sm font-medium text-green-800">Type de produit textile *</label>
                                     <select
                                         value={data.productInfo?.ecobalyseProductType || ''}
                                         onChange={(e) => setData(prev => ({
                                             ...prev,
                                             productInfo: { ...prev.productInfo!, ecobalyseProductType: e.target.value as EcobalyseProductType }
                                         }))}
-                                        className="w-full px-4 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-green-500 outline-none"
+                                        className="w-full px-4 py-2 rounded-lg border border-green-200 bg-white focus:ring-2 focus:ring-green-500 outline-none"
                                     >
                                         <option value="">Sélectionner un type</option>
                                         {ecobalyseProducts.map(product => (
@@ -585,7 +585,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Masse du produit (kg) *</label>
+                                    <label className="text-sm font-medium text-green-800">Masse du produit (kg) *</label>
                                     <input
                                         type="number"
                                         step="0.01"
@@ -599,14 +599,14 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                             }));
                                         }}
                                         placeholder="Ex: 0.17 pour un t-shirt"
-                                        className="w-full px-4 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-green-500 outline-none"
+                                        className="w-full px-4 py-2 rounded-lg border border-green-200 bg-white focus:ring-2 focus:ring-green-500 outline-none"
                                     />
                                 </div>
                             </div>
 
                             {/* Composition des matières */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-green-800 dark:text-green-200">
+                                <label className="text-sm font-medium text-green-800">
                                     Composition des matières * <span className="text-xs text-green-600">(total: {Math.round((data.productInfo?.ecobalyseMaterials?.reduce((sum, m) => sum + m.share, 0) || 0) * 100)}%)</span>
                                 </label>
                                 <div className="space-y-2">
@@ -615,7 +615,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                             <select
                                                 value={mat.id}
                                                 onChange={(e) => updateEcobalyseMaterial(index, 'id', e.target.value)}
-                                                className="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                                className="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-green-200 bg-white text-sm"
                                             >
                                                 <option value="">Sélectionner une matière</option>
                                                 {ecobalyseMaterials.map(m => (
@@ -629,7 +629,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                                     max="100"
                                                     value={Math.round(mat.share * 100) || ''}
                                                     onChange={(e) => updateEcobalyseMaterial(index, 'share', (parseInt(e.target.value) || 0) / 100)}
-                                                    className="w-16 px-2 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm text-center"
+                                                    className="w-16 px-2 py-2 rounded-lg border border-green-200 bg-white text-sm text-center"
                                                     placeholder="100"
                                                 />
                                                 <span className="text-sm">%</span>
@@ -637,7 +637,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                             <select
                                                 value={mat.country || ''}
                                                 onChange={(e) => updateEcobalyseMaterial(index, 'country', e.target.value)}
-                                                className="w-32 px-2 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                                className="w-32 px-2 py-2 rounded-lg border border-green-200 bg-white text-sm"
                                             >
                                                 <option value="">Origine</option>
                                                 {ecobalyseCountries.map(c => (
@@ -647,7 +647,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                             <button
                                                 type="button"
                                                 onClick={() => removeEcobalyseMaterial(index)}
-                                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded"
                                             >
                                                 <Trash size={14} />
                                             </button>
@@ -657,7 +657,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                 <button
                                     type="button"
                                     onClick={addEcobalyseMaterial}
-                                    className="w-full py-2 border border-dashed border-green-300 dark:border-green-700 rounded-lg text-green-600 hover:border-green-500 hover:bg-green-50/50 transition-colors flex items-center justify-center gap-2 text-sm"
+                                    className="w-full py-2 border border-dashed border-green-300 rounded-lg text-green-600 hover:border-green-500 hover:bg-green-50/50 transition-colors flex items-center justify-center gap-2 text-sm"
                                 >
                                     <Plus size={14} /> Ajouter une matière
                                 </button>
@@ -666,14 +666,14 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                             {/* Pays de fabrication */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Pays de confection</label>
+                                    <label className="text-sm font-medium text-green-800">Pays de confection</label>
                                     <select
                                         value={data.productInfo?.ecobalyseCountryMaking || ''}
                                         onChange={(e) => setData(prev => ({
                                             ...prev,
                                             productInfo: { ...prev.productInfo!, ecobalyseCountryMaking: e.target.value }
                                         }))}
-                                        className="w-full px-3 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                        className="w-full px-3 py-2 rounded-lg border border-green-200 bg-white text-sm"
                                     >
                                         <option value="">Non spécifié</option>
                                         {ecobalyseCountries.map(c => (
@@ -682,14 +682,14 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-green-800 dark:text-green-200">Procédé de fabrication</label>
+                                    <label className="text-sm font-medium text-green-800">Procédé de fabrication</label>
                                     <select
                                         value={data.productInfo?.ecobalyseFabricProcess || ''}
                                         onChange={(e) => setData(prev => ({
                                             ...prev,
                                             productInfo: { ...prev.productInfo!, ecobalyseFabricProcess: e.target.value as EcobalyseFabricProcess }
                                         }))}
-                                        className="w-full px-3 py-2 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-zinc-900 text-sm"
+                                        className="w-full px-3 py-2 rounded-lg border border-green-200 bg-white text-sm"
                                     >
                                         <option value="">Non spécifié</option>
                                         <option value="knitting-mix">Tricotage moyen</option>
@@ -701,7 +701,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                             </div>
 
                             {/* Bouton de calcul */}
-                            <div className="pt-4 border-t border-green-200 dark:border-green-800">
+                            <div className="pt-4 border-t border-green-200">
                                 <button
                                     type="button"
                                     onClick={calculateEcobalyseScore}
@@ -724,26 +724,26 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
 
                             {/* Score display */}
                             {ecobalyseScore.error && (
-                                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
+                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                                     ⚠️ {ecobalyseScore.error}
                                 </div>
                             )}
 
                             {ecobalyseScore.calculated && (
-                                <div className="p-4 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border border-green-300 dark:border-green-700">
-                                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center gap-2">
+                                <div className="p-4 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl border border-green-300">
+                                    <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
                                         <Award className="text-green-600" size={20} />
                                         Résultats du score environnemental
                                     </h4>
                                     <div className="flex flex-col items-center gap-3">
                                         <EthicalScoreBadge score={ecobalyseScore.ecs} size="lg" showLabel />
                                         <div className="text-center">
-                                            <div className="text-2xl font-bold text-zinc-800 dark:text-zinc-200">
+                                            <div className="text-2xl font-bold text-zinc-800">
                                                 {ecobalyseScore.ecs?.toFixed(0) || '-'} µPts
                                             </div>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-green-600 dark:text-green-400 mt-3 text-center">
+                                    <p className="text-xs text-green-600 mt-3 text-center">
                                         Calculé via l'API Ecobalyse - Plus le score est bas, meilleur est l'impact
                                     </p>
                                 </div>
@@ -756,7 +756,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="px-4 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                        className="px-4 py-2 text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
                     >
                         Annuler
                     </button>

@@ -247,7 +247,7 @@ export default function CartPage() {
                             return (
                                 <div
                                     key={item.id}
-                                    className="flex gap-4 sm:gap-6 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-secondary/10 shadow-sm hover:shadow-md transition-shadow group"
+                                    className="flex gap-4 sm:gap-6 p-4 bg-white rounded-2xl border border-secondary/10 shadow-sm hover:shadow-md transition-shadow group"
                                 >
                                     {/* Product Image */}
                                     <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-secondary/5 flex-shrink-0">
@@ -287,7 +287,7 @@ export default function CartPage() {
                                             <div className="flex items-center gap-1 bg-secondary/10 rounded-lg p-1">
                                                 <button
                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                    className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
+                                                    className="p-1.5 hover:bg-white rounded-md transition-colors text-foreground/70"
                                                     disabled={isLoading}
                                                 >
                                                     <Minus className="w-4 h-4" />
@@ -295,7 +295,7 @@ export default function CartPage() {
                                                 <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
                                                 <button
                                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                    className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
+                                                    className="p-1.5 hover:bg-white rounded-md transition-colors text-foreground/70"
                                                     disabled={isLoading}
                                                 >
                                                     <Plus className="w-4 h-4" />
@@ -332,7 +332,7 @@ export default function CartPage() {
 
                 {/* Summary Card */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-secondary/10 shadow-lg p-8 sticky top-28">
+                    <div className="bg-white rounded-2xl border border-secondary/10 shadow-lg p-8 sticky top-28">
                         <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Récapitulatif</h2>
 
                         <div className="space-y-4 mb-8">
@@ -651,13 +651,13 @@ export default function CartPage() {
 
                         <div className="mt-8 space-y-4">
                             <div className="flex items-center gap-3 text-xs text-foreground/50">
-                                <div className="p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md">
+                                <div className="p-1.5 bg-zinc-100 rounded-md">
                                     <ShoppingCart className="w-4 h-4" />
                                 </div>
                                 Paiement sécurisé par Stripe ou PayPal
                             </div>
                             <div className="flex items-center gap-3 text-xs text-foreground/50">
-                                <div className="p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md">
+                                <div className="p-1.5 bg-zinc-100 rounded-md">
                                     <Leaf className="w-4 h-4" />
                                 </div>
                                 1% reversé à des associations de reforestation

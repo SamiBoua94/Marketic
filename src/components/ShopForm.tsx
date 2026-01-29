@@ -137,7 +137,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 relative">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg overflow-hidden border border-zinc-200 relative">
 
             {/* View/Edit Toggle Button (Only visible if we have a shop) */}
             {initialData && !isEditMode && (
@@ -145,7 +145,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                     <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); setIsEditMode(true); }}
-                        className="p-2 bg-white/90 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-full shadow-sm border border-zinc-200 dark:border-zinc-700 transition-all"
+                        className="p-2 bg-white/90 hover:bg-white text-zinc-700 rounded-full shadow-sm border border-zinc-200 transition-all"
                         title="Modifier la boutique"
                     >
                         <Pencil size={20} />
@@ -154,7 +154,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
             )}
 
             {/* Banner Section */}
-            <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800 group">
+            <div className="relative h-48 bg-zinc-100 group">
                 {data.bannerPicture ? (
                     <img
                         src={data.bannerPicture}
@@ -191,7 +191,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
             <div className="px-8 relative mb-8">
                 <div className="absolute -top-16 left-8">
                     <div className="relative group">
-                        <div className="w-32 h-32 rounded-full border-4 border-white dark:border-zinc-900 overflow-hidden bg-zinc-100 dark:bg-zinc-800 shadow-md">
+                        <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-zinc-100 shadow-md">
                             {data.profilePicture ? (
                                 <img
                                     src={data.profilePicture}
@@ -209,7 +209,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                 <button
                                     type="button"
                                     onClick={() => profileInputRef.current?.click()}
-                                    className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition-colors border-2 border-white dark:border-zinc-900"
+                                    className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition-colors border-2 border-white"
                                 >
                                     <Camera size={16} />
                                 </button>
@@ -230,7 +230,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
             <div className="p-8 pt-4 space-y-6">
                 <div>
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                        <h2 className="text-2xl font-bold text-zinc-900">
                             {initialData ? data.name : (isEditMode ? 'Créer ma boutique' : 'Ma Boutique')}
                         </h2>
                     </div>
@@ -238,24 +238,24 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Name Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nom de la boutique</label>
+                            <label className="text-sm font-medium text-zinc-700">Nom de la boutique</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     value={data.name}
                                     onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                     placeholder="Ma Super Boutique"
                                     required
                                 />
                             ) : (
-                                <p className="text-zinc-900 dark:text-zinc-100 py-2 font-medium">{data.name}</p>
+                                <p className="text-zinc-900 py-2 font-medium">{data.name}</p>
                             )}
                         </div>
 
                         {/* Email Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Email professionnel</label>
+                            <label className="text-sm font-medium text-zinc-700">Email professionnel</label>
                             <div className="relative">
                                 <Mail className="absolute left-3 top-2.5 text-zinc-400" size={20} />
                                 {isEditMode ? (
@@ -263,18 +263,18 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="email"
                                         value={data.email || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))}
-                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="contact@boutique.com"
                                     />
                                 ) : (
-                                    <p className="pl-10 py-2 text-zinc-900 dark:text-zinc-100">{data.email || '-'}</p>
+                                    <p className="pl-10 py-2 text-zinc-900">{data.email || '-'}</p>
                                 )}
                             </div>
                         </div>
 
                         {/* Phone Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Téléphone</label>
+                            <label className="text-sm font-medium text-zinc-700">Téléphone</label>
                             <div className="relative">
                                 <Phone className="absolute left-3 top-2.5 text-zinc-400" size={20} />
                                 {isEditMode ? (
@@ -282,18 +282,18 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="tel"
                                         value={data.phone || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, phone: e.target.value }))}
-                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="+33 6 12 34 56 78"
                                     />
                                 ) : (
-                                    <p className="pl-10 py-2 text-zinc-900 dark:text-zinc-100">{data.phone || '-'}</p>
+                                    <p className="pl-10 py-2 text-zinc-900">{data.phone || '-'}</p>
                                 )}
                             </div>
                         </div>
 
                         {/* Address Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Adresse</label>
+                            <label className="text-sm font-medium text-zinc-700">Adresse</label>
                             <div className="relative">
                                 <MapPin className="absolute left-3 top-2.5 text-zinc-400" size={20} />
                                 {isEditMode ? (
@@ -301,55 +301,55 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="text"
                                         value={data.address || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, address: e.target.value }))}
-                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="123 Rue du Commerce"
                                     />
                                 ) : (
-                                    <p className="pl-10 py-2 text-zinc-900 dark:text-zinc-100">{data.address || '-'}</p>
+                                    <p className="pl-10 py-2 text-zinc-900">{data.address || '-'}</p>
                                 )}
                             </div>
                         </div>
 
                         {/* City Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Ville</label>
+                            <label className="text-sm font-medium text-zinc-700">Ville</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     value={data.city || ''}
                                     onChange={(e) => setData(prev => ({ ...prev, city: e.target.value }))}
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                     placeholder="Paris"
                                 />
                             ) : (
-                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.city || '-'}</p>
+                                <p className="text-zinc-900 py-2">{data.city || '-'}</p>
                             )}
                         </div>
 
                         {/* Postal Code Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Code postal</label>
+                            <label className="text-sm font-medium text-zinc-700">Code postal</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     value={data.postalCode || ''}
                                     onChange={(e) => setData(prev => ({ ...prev, postalCode: e.target.value }))}
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                     placeholder="75001"
                                 />
                             ) : (
-                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.postalCode || '-'}</p>
+                                <p className="text-zinc-900 py-2">{data.postalCode || '-'}</p>
                             )}
                         </div>
 
                         {/* Legal Status Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Statut légal du commerçant</label>
+                            <label className="text-sm font-medium text-zinc-700">Statut légal du commerçant</label>
                             {isEditMode ? (
                                 <select
                                     value={data.legalStatus || ''}
                                     onChange={(e) => setData(prev => ({ ...prev, legalStatus: e.target.value }))}
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                 >
                                     <option value="">Sélectionner</option>
                                     <option value="auto-entrepreneur">Auto-entrepreneur</option>
@@ -362,23 +362,23 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                     <option value="autre">Autre</option>
                                 </select>
                             ) : (
-                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.legalStatus || '-'}</p>
+                                <p className="text-zinc-900 py-2">{data.legalStatus || '-'}</p>
                             )}
                         </div>
                     </div>
 
                     {/* Description */}
                     <div className="space-y-2 mt-6">
-                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</label>
+                        <label className="text-sm font-medium text-zinc-700">Description</label>
                         {isEditMode ? (
                             <textarea
                                 value={data.description || ''}
                                 onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-                                className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none min-h-[100px]"
+                                className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none min-h-[100px]"
                                 placeholder="Décrivez votre activité..."
                             />
                         ) : (
-                            <p className="px-4 py-2 text-zinc-900 dark:text-zinc-100 whitespace-pre-wrap border border-transparent">
+                            <p className="px-4 py-2 text-zinc-900 whitespace-pre-wrap border border-transparent">
                                 {data.description || <span className="text-zinc-400 italic">Aucune description</span>}
                             </p>
                         )}
@@ -388,23 +388,23 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         {/* SIRET */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Numéro SIRET</label>
+                            <label className="text-sm font-medium text-zinc-700">Numéro SIRET</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     value={data.siret || ''}
                                     onChange={(e) => setData(prev => ({ ...prev, siret: e.target.value }))}
-                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="w-full px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                     placeholder="123 456 789 00012"
                                 />
                             ) : (
-                                <p className="text-zinc-900 dark:text-zinc-100 py-2">{data.siret || '-'}</p>
+                                <p className="text-zinc-900 py-2">{data.siret || '-'}</p>
                             )}
                         </div>
 
                         {/* Social Networks */}
                         <div className="space-y-4">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block">Réseaux Sociaux</label>
+                            <label className="text-sm font-medium text-zinc-700 block">Réseaux Sociaux</label>
 
                             {/* Instagram */}
                             <div className="flex items-center gap-2">
@@ -414,11 +414,11 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="text"
                                         value={data.instagram || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, instagram: e.target.value }))}
-                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="@mon_instagram"
                                     />
                                 ) : (
-                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.instagram || '-'}</p>
+                                    <p className="flex-1 py-1 text-zinc-900">{data.instagram || '-'}</p>
                                 )}
                             </div>
 
@@ -430,11 +430,11 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="text"
                                         value={data.facebook || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, facebook: e.target.value }))}
-                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="facebook.com/ma.boutique"
                                     />
                                 ) : (
-                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.facebook || '-'}</p>
+                                    <p className="flex-1 py-1 text-zinc-900">{data.facebook || '-'}</p>
                                 )}
                             </div>
 
@@ -446,11 +446,11 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="text"
                                         value={data.twitter || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, twitter: e.target.value }))}
-                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="@mon_twitter"
                                     />
                                 ) : (
-                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.twitter || '-'}</p>
+                                    <p className="flex-1 py-1 text-zinc-900">{data.twitter || '-'}</p>
                                 )}
                             </div>
 
@@ -462,11 +462,11 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="text"
                                         value={data.tiktok || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, tiktok: e.target.value }))}
-                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="@mon_tiktok"
                                     />
                                 ) : (
-                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.tiktok || '-'}</p>
+                                    <p className="flex-1 py-1 text-zinc-900">{data.tiktok || '-'}</p>
                                 )}
                             </div>
 
@@ -478,11 +478,11 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         type="text"
                                         value={data.youtube || ''}
                                         onChange={(e) => setData(prev => ({ ...prev, youtube: e.target.value }))}
-                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                        className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                         placeholder="youtube.com/@machaîne"
                                     />
                                 ) : (
-                                    <p className="flex-1 py-1 text-zinc-900 dark:text-zinc-100">{data.youtube || '-'}</p>
+                                    <p className="flex-1 py-1 text-zinc-900">{data.youtube || '-'}</p>
                                 )}
                             </div>
                         </div>
@@ -490,13 +490,13 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
 
                     {/* Shop Tags Section */}
                     <div className="mt-6">
-                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Choisir mes Tags</label>
+                        <label className="text-sm font-medium text-zinc-700 mb-2 block">Choisir mes Tags</label>
                         <div className="flex flex-wrap gap-2 mb-3">
                             {data.tags?.map((tag, index) => (
-                                <span key={index} className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium">
+                                <span key={index} className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
                                     {tag}
                                     {isEditMode && (
-                                        <button type="button" onClick={() => setData(prev => ({ ...prev, tags: prev.tags?.filter((_, i) => i !== index) }))} className="hover:text-blue-900 dark:hover:text-blue-200 ml-1">
+                                        <button type="button" onClick={() => setData(prev => ({ ...prev, tags: prev.tags?.filter((_, i) => i !== index) }))} className="hover:text-blue-900 ml-1">
                                             ×
                                         </button>
                                     )}
@@ -508,7 +508,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                 <input
                                     type="text"
                                     placeholder="Ajouter un tag (ex: Bio, Local, Artisanat...)"
-                                    className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault();
@@ -526,8 +526,8 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
 
                     {/* Certification Section */}
                     <div className="mt-8">
-                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Certification</label>
-                        <div className={`p-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border ${isEditMode ? 'border-dashed border-zinc-300 dark:border-zinc-700' : 'border-zinc-100 dark:border-zinc-800'} flex flex-col items-center justify-center text-center transition-all`}>
+                        <label className="text-sm font-medium text-zinc-700 mb-2 block">Certification</label>
+                        <div className={`p-6 bg-zinc-50 rounded-xl border ${isEditMode ? 'border-dashed border-zinc-300' : 'border-zinc-100'} flex flex-col items-center justify-center text-center transition-all`}>
 
                             {data.certificationPicture ? (
                                 <div className="space-y-4 w-full">
@@ -548,10 +548,10 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center mb-3 shadow-sm mx-auto">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm mx-auto">
                                         <FileCheck className="text-zinc-400" size={24} />
                                     </div>
-                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                    <p className="text-sm text-zinc-500">
                                         {isEditMode
                                             ? "Ajouter un document de certification (KBIS, etc...)"
                                             : "Aucune certification ajoutée"}
@@ -560,7 +560,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                         <button
                                             type="button"
                                             onClick={() => certificationInputRef.current?.click()}
-                                            className="mt-4 px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                            className="mt-4 px-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm hover:bg-zinc-50 transition-colors"
                                         >
                                             Importer depuis l'ordinateur
                                         </button>
@@ -578,11 +578,11 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800">
+                    <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-100">
                         <button
                             type="button"
                             disabled
-                            className="px-6 py-2.5 bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600 rounded-lg font-medium cursor-not-allowed flex items-center gap-2"
+                            className="px-6 py-2.5 bg-zinc-100 text-zinc-400 rounded-lg font-medium cursor-not-allowed flex items-center gap-2"
                         >
                             <span>+</span> Ajouter un article
                         </button>
@@ -597,7 +597,7 @@ export default function ShopForm({ initialData, onSuccess }: ShopFormProps) {
                                             if (initialData) setData(initialData); // Reset
                                             setIsEditMode(false);
                                         }}
-                                        className="px-6 py-2.5 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                        className="px-6 py-2.5 border border-zinc-200 text-zinc-700 rounded-lg font-medium hover:bg-zinc-50 transition-colors"
                                     >
                                         Annuler
                                     </button>

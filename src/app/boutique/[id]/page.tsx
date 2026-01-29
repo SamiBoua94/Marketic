@@ -75,8 +75,8 @@ function ProductCard({ product }: { product: Product }) {
 
     return (
         <Link href={`/product/${product.id}`} className="block group">
-            <div className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:border-emerald-500/50 transition-all duration-300">
-                <div className="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+            <div className="bg-white rounded-xl overflow-hidden border border-zinc-200 hover:shadow-lg hover:border-emerald-500/50 transition-all duration-300">
+                <div className="aspect-square relative overflow-hidden bg-zinc-100">
                     {images.length > 0 ? (
                         <img
                             src={images[0]}
@@ -94,22 +94,22 @@ function ProductCard({ product }: { product: Product }) {
                     </div>
                 </div>
                 <div className="p-4">
-                    <h3 className="font-semibold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 transition-colors">
+                    <h3 className="font-semibold text-zinc-900 line-clamp-1 group-hover:text-emerald-600 transition-colors">
                         {product.name}
                     </h3>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                    <p className="text-sm text-zinc-500 mt-1 line-clamp-2">
                         {product.description}
                     </p>
                     {tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                             {tags.slice(0, 2).map((tag, idx) => (
-                                <span key={idx} className="text-xs px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400">
+                                <span key={idx} className="text-xs px-2 py-0.5 bg-zinc-100 rounded-full text-zinc-600">
                                     {tag}
                                 </span>
                             ))}
                         </div>
                     )}
-                    <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                    <div className="mt-3 pt-3 border-t border-zinc-100 flex justify-between items-center">
                         <span className="font-bold text-lg text-emerald-600">{product.price.toFixed(2)} €</span>
                     </div>
                     {/* Bouton Ajouter au panier */}
@@ -182,7 +182,7 @@ export default function BoutiquePage() {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <Store className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
-                    <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">{error || 'Boutique introuvable'}</h1>
+                    <h1 className="text-2xl font-bold text-zinc-900 mb-2">{error || 'Boutique introuvable'}</h1>
                     <p className="text-zinc-500 mb-6">Cette boutique n'existe pas ou a été supprimée.</p>
                     <Link href="/" className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700">
                         <ArrowLeft size={18} />
@@ -194,7 +194,7 @@ export default function BoutiquePage() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <div className="min-h-screen bg-zinc-50">
             {/* Banner */}
             <div className="relative h-48 md:h-64 lg:h-80 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600">
                 {shop.bannerPicture && (
@@ -219,7 +219,7 @@ export default function BoutiquePage() {
             {/* Shop Info */}
             <div className="container mx-auto px-4">
                 <div className="relative -mt-16 mb-8">
-                    <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800">
+                    <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-zinc-200">
                         <div className="flex flex-col md:flex-row gap-6">
                             {/* Profile Picture */}
                             <div className="flex-shrink-0">
@@ -227,10 +227,10 @@ export default function BoutiquePage() {
                                     <img
                                         src={shop.profilePicture}
                                         alt={shop.name}
-                                        className="w-24 h-24 md:w-32 md:h-32 rounded-xl object-cover border-4 border-white dark:border-zinc-800 shadow-lg -mt-16 md:-mt-20"
+                                        className="w-24 h-24 md:w-32 md:h-32 rounded-xl object-cover border-4 border-white shadow-lg -mt-16 md:-mt-20"
                                     />
                                 ) : (
-                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 border-4 border-white dark:border-zinc-800 shadow-lg -mt-16 md:-mt-20 flex items-center justify-center">
+                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-emerald-100 border-4 border-white shadow-lg -mt-16 md:-mt-20 flex items-center justify-center">
                                         <Store className="w-10 h-10 text-emerald-600" />
                                     </div>
                                 )}
@@ -238,7 +238,7 @@ export default function BoutiquePage() {
 
                             {/* Info */}
                             <div className="flex-1">
-                                <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+                                <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 mb-2">
                                     {shop.name}
                                 </h1>
 
@@ -250,7 +250,7 @@ export default function BoutiquePage() {
                                 )}
 
                                 {shop.description && (
-                                    <p className="text-zinc-600 dark:text-zinc-400 mb-4 max-w-2xl">
+                                    <p className="text-zinc-600 mb-4 max-w-2xl">
                                         {shop.description}
                                     </p>
                                 )}
@@ -261,7 +261,7 @@ export default function BoutiquePage() {
                                         {parsedTags.map((tag, idx) => (
                                             <span
                                                 key={idx}
-                                                className="px-3 py-1 text-sm bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full"
+                                                className="px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-full"
                                             >
                                                 {tag}
                                             </span>
@@ -272,13 +272,13 @@ export default function BoutiquePage() {
                                 {/* Contact & Social */}
                                 <div className="flex flex-wrap gap-4 items-center">
                                     {shop.email && (
-                                        <a href={`mailto:${shop.email}`} className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 transition-colors">
+                                        <a href={`mailto:${shop.email}`} className="flex items-center gap-2 text-sm text-zinc-600 hover:text-emerald-600 transition-colors">
                                             <Mail className="w-4 h-4" />
                                             {shop.email}
                                         </a>
                                     )}
                                     {shop.phone && (
-                                        <a href={`tel:${shop.phone}`} className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 transition-colors">
+                                        <a href={`tel:${shop.phone}`} className="flex items-center gap-2 text-sm text-zinc-600 hover:text-emerald-600 transition-colors">
                                             <Phone className="w-4 h-4" />
                                             {shop.phone}
                                         </a>
@@ -287,17 +287,17 @@ export default function BoutiquePage() {
                                     {/* Social links */}
                                     <div className="flex gap-2 ml-auto">
                                         {shop.instagram && (
-                                            <a href={shop.instagram} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-pink-100 hover:text-pink-600 transition-colors">
+                                            <a href={shop.instagram} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 text-zinc-600 hover:bg-pink-100 hover:text-pink-600 transition-colors">
                                                 <Instagram size={18} />
                                             </a>
                                         )}
                                         {shop.facebook && (
-                                            <a href={shop.facebook} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                                            <a href={shop.facebook} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 text-zinc-600 hover:bg-blue-100 hover:text-blue-600 transition-colors">
                                                 <Facebook size={18} />
                                             </a>
                                         )}
                                         {shop.twitter && (
-                                            <a href={shop.twitter} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-sky-100 hover:text-sky-600 transition-colors">
+                                            <a href={shop.twitter} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-zinc-100 text-zinc-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">
                                                 <Twitter size={18} />
                                             </a>
                                         )}
@@ -338,7 +338,7 @@ export default function BoutiquePage() {
                 <div className="pb-16">
                     <div className="flex items-center gap-3 mb-6">
                         <ShoppingBag className="w-6 h-6 text-emerald-600" />
-                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                        <h2 className="text-xl font-bold text-zinc-900">
                             Produits de la boutique
                         </h2>
                         <span className="text-sm text-zinc-500">
@@ -353,7 +353,7 @@ export default function BoutiquePage() {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                        <div className="text-center py-16 bg-white rounded-xl border border-zinc-200">
                             <ShoppingBag className="w-12 h-12 text-zinc-300 mx-auto mb-4" />
                             <p className="text-zinc-500">Cette boutique n'a pas encore de produits.</p>
                         </div>

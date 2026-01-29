@@ -27,12 +27,12 @@ interface ProductListProps {
 export default function ProductList({ products, onEdit, onDelete }: ProductListProps) {
     if (!products || products.length === 0) {
         return (
-            <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700">
-                <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center py-12 bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Package className="text-zinc-400" size={32} />
                 </div>
-                <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-1">Aucun article</h3>
-                <p className="text-zinc-500 dark:text-zinc-400">Commencez par ajouter votre premier produit.</p>
+                <h3 className="text-lg font-medium text-zinc-900 mb-1">Aucun article</h3>
+                <p className="text-zinc-500">Commencez par ajouter votre premier produit.</p>
             </div>
         );
     }
@@ -58,9 +58,9 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
 
 
                 return (
-                    <div key={product.id} className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden group hover:shadow-md transition-shadow">
+                    <div key={product.id} className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden group hover:shadow-md transition-shadow">
                         {/* Image */}
-                        <div className="h-48 bg-zinc-100 dark:bg-zinc-800 relative">
+                        <div className="h-48 bg-zinc-100 relative">
                             {mainImage ? (
                                 <img
                                     src={mainImage}
@@ -79,7 +79,7 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                             <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
                                     onClick={() => onEdit(product)}
-                                    className="p-2 bg-white/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 rounded-full shadow-sm hover:scale-105 transition-transform"
+                                    className="p-2 bg-white/90 text-zinc-700 rounded-full shadow-sm hover:scale-105 transition-transform"
                                     title="Modifier"
                                 >
                                     <Edit size={16} />
@@ -104,25 +104,25 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                                 <div className="flex-1">
                                     <div className="flex flex-wrap gap-1 mb-2">
                                         {tags.length > 0 ? tags.map((tag: string, i: number) => (
-                                            <span key={i} className="text-[10px] font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
+                                            <span key={i} className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                                                 {tag}
                                             </span>
                                         )) : (
-                                            <span className="text-[10px] font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+                                            <span className="text-[10px] font-medium text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
                                                 Sans tag
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="font-semibold text-zinc-900 dark:text-white line-clamp-1">{product.name}</h3>
+                                    <h3 className="font-semibold text-zinc-900 line-clamp-1">{product.name}</h3>
                                 </div>
                                 <div className="text-right">
-                                    <span className="font-bold text-zinc-900 dark:text-white">{product.price.toFixed(2)} €</span>
+                                    <span className="font-bold text-zinc-900">{product.price.toFixed(2)} €</span>
                                 </div>
                             </div>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-4 h-10">
+                            <p className="text-sm text-zinc-500 line-clamp-2 mb-4 h-10">
                                 {product.description}
                             </p>
-                            <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                            <div className="flex items-center justify-between text-sm text-zinc-500 pt-3 border-t border-zinc-100">
                                 <span>Stock: {product.stock}</span>
                             </div>
                         </div>

@@ -71,10 +71,10 @@ export function SearchResults({ query }: SearchResultsProps) {
         <div className="container mx-auto px-4 py-12">
             {!hasResults && searched && (
                 <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4">
-                    <div className="inline-flex p-4 bg-zinc-100 dark:bg-zinc-800 rounded-full mb-6 text-zinc-400">
+                    <div className="inline-flex p-4 bg-zinc-100 rounded-full mb-6 text-zinc-400">
                         <SearchX size={48} />
                     </div>
-                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Aucune boutique trouvée</h2>
+                    <h2 className="text-2xl font-bold text-zinc-900 mb-2">Aucune boutique trouvée</h2>
                     <p className="text-zinc-500 max-w-md mx-auto">
                         Nous n'avons trouvé aucune boutique pour "{query}". Essayez un autre terme de recherche.
                     </p>
@@ -85,7 +85,7 @@ export function SearchResults({ query }: SearchResultsProps) {
                 <div className="animate-in fade-in duration-500">
                     <div className="flex items-center gap-3 mb-8">
                         <Store className="w-6 h-6 text-emerald-600" />
-                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                        <h2 className="text-2xl font-bold text-zinc-900">
                             Boutiques pour "{query}"
                         </h2>
                         <span className="text-sm text-zinc-500">({shops.length} résultat{shops.length !== 1 ? 's' : ''})</span>

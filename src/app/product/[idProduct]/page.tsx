@@ -350,14 +350,14 @@ export default function ProductDetailPage() {
               <div className="flex items-center gap-2 bg-secondary/10 rounded-lg p-1">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
+                  className="p-1.5 hover:bg-white rounded-md transition-colors text-foreground/70"
                 >
                   -
                 </button>
                 <span className="w-8 text-center font-medium">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="p-1.5 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors text-foreground/70"
+                  className="p-1.5 hover:bg-white rounded-md transition-colors text-foreground/70"
                 >
                   +
                 </button>
@@ -508,7 +508,7 @@ export default function ProductDetailPage() {
           ) : (
             <div className="space-y-6">
               {reviews.map((review) => (
-                <div key={review.id} className="bg-white dark:bg-zinc-900 rounded-xl border border-secondary/20 p-6">
+                <div key={review.id} className="bg-white rounded-xl border border-secondary/20 p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary/10">

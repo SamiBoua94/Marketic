@@ -20,63 +20,63 @@ function getScoreColorAndLabel(score: number | null | undefined): {
 } {
     if (score === null || score === undefined) {
         return {
-            bgColor: 'bg-zinc-100 dark:bg-zinc-800',
-            textColor: 'text-zinc-500 dark:text-zinc-400',
-            borderColor: 'border-zinc-200 dark:border-zinc-700',
+            bgColor: 'bg-zinc-100',
+            textColor: 'text-zinc-500',
+            borderColor: 'border-zinc-200',
             label: 'Non évalué'
         };
     }
 
     if (score < 400) {
         return {
-            bgColor: 'bg-green-600 dark:bg-green-700',
+            bgColor: 'bg-green-600',
             textColor: 'text-white',
-            borderColor: 'border-green-700 dark:border-green-600',
+            borderColor: 'border-green-700',
             label: 'Excellent'
         };
     }
 
     if (score < 700) {
         return {
-            bgColor: 'bg-lime-500 dark:bg-lime-600',
+            bgColor: 'bg-lime-500',
             textColor: 'text-white',
-            borderColor: 'border-lime-600 dark:border-lime-500',
+            borderColor: 'border-lime-600',
             label: 'Bon'
         };
     }
 
     if (score < 1000) {
         return {
-            bgColor: 'bg-yellow-400 dark:bg-yellow-500',
+            bgColor: 'bg-yellow-400',
             textColor: 'text-yellow-900',
-            borderColor: 'border-yellow-500 dark:border-yellow-400',
+            borderColor: 'border-yellow-500',
             label: 'Moyen'
         };
     }
 
     if (score < 1400) {
         return {
-            bgColor: 'bg-orange-500 dark:bg-orange-600',
+            bgColor: 'bg-orange-500',
             textColor: 'text-white',
-            borderColor: 'border-orange-600 dark:border-orange-500',
+            borderColor: 'border-orange-600',
             label: 'À améliorer'
         };
     }
 
     if (score < 2000) {
         return {
-            bgColor: 'bg-red-600 dark:bg-red-700',
+            bgColor: 'bg-red-600',
             textColor: 'text-white',
-            borderColor: 'border-red-700 dark:border-red-600',
+            borderColor: 'border-red-700',
             label: 'Mauvais'
         };
     }
 
     // >= 2000
     return {
-        bgColor: 'bg-zinc-900 dark:bg-zinc-950',
+        bgColor: 'bg-zinc-900',
         textColor: 'text-white',
-        borderColor: 'border-zinc-950 dark:border-zinc-800',
+        borderColor: 'border-zinc-950',
         label: 'Critique'
     };
 }
