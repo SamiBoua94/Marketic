@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { useCart } from '@/context/cart-context';
@@ -176,6 +176,16 @@ export function Header() {
                                         <Store className="w-4 h-4" />
                                         {user.hasShop ? "Gérer ma boutique" : "Ouvrir ma boutique"}
                                     </Link>
+                                    {user.hasShop && (
+                                        <Link
+                                            href="/data-analysis"
+                                            onClick={() => setDropdownOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                        >
+                                            <BarChart3 className="w-4 h-4" />
+                                            Data Analysis
+                                        </Link>
+                                    )}
                                     <Link
                                         href="/orders"
                                         onClick={() => setDropdownOpen(false)}
