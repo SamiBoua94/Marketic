@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingCart, Store, Star, Heart, Share2, Truck, Shield, Leaf, MessageSquare, ThumbsUp, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Store, Star, Heart, Share2, Truck, Shield, Leaf, MessageSquare, ThumbsUp, User as UserIcon, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EthicalScoreBadge } from '@/components/ui/EthicalScoreBadge';
 import { useCart } from '@/context/cart-context';
 import { useAuth } from '@/context/auth-context';
+import { AnimatedBackground, FloatingLeaves } from '@/components/ui/AnimatedBackground';
 
 function normalizeImageUrls(images: unknown): string[] {
   if (Array.isArray(images)) {
@@ -234,26 +235,26 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-20 flex items-center justify-center">
+      <AnimatedBackground variant="subtle" className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-foreground/60">Chargement du produit...</p>
+          <p className="text-foreground/60 animate-pulse">Chargement de la pépite...</p>
         </div>
-      </div>
+      </AnimatedBackground>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="container mx-auto px-4 py-20 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Produit non trouvé</h1>
-          <p className="text-foreground/60 mb-6">{error || 'Ce produit n\'existe pas.'}</p>
+      <AnimatedBackground variant="subtle" className="min-h-screen flex items-center justify-center">
+        <div className="text-center bg-white/50 backdrop-blur-sm p-12 rounded-[2rem] border border-secondary/20 shadow-soft">
+          <h1 className="text-2xl font-bold font-heading text-foreground mb-4">Produit introuvable</h1>
+          <p className="text-foreground/60 mb-8">{error || 'Ce produit n\'existe pas ou a été retiré.'}</p>
           <Link href="/products">
-            <Button variant="primary">Retour aux produits</Button>
+            <Button className="rounded-xl px-8 py-6">Retour aux produits</Button>
           </Link>
         </div>
-      </div>
+      </AnimatedBackground>
     );
   }
 
@@ -261,323 +262,364 @@ export default function ProductDetailPage() {
   const fallbackImage = 'https://placehold.co/800x600?text=Produit';
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-foreground/60 mb-8">
-        <Link href="/" className="hover:text-primary">Accueil</Link>
-        <span>/</span>
-        <Link href="/products" className="hover:text-primary">Produits</Link>
-        <span>/</span>
-        <span className="text-foreground truncate max-w-xs">{product.name}</span>
-      </nav>
+    <AnimatedBackground variant="subtle" className="min-h-screen pb-20">
+      <div className="container mx-auto px-4 py-8 max-w-7xl pt-24">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-foreground/60 mb-8 animate-fade-in-up">
+          <Link href="/" className="hover:text-primary transition-colors">Accueil</Link>
+          <span>/</span>
+          <Link href="/products" className="hover:text-primary transition-colors">Produits</Link>
+          <span>/</span>
+          <span className="text-foreground font-medium truncate max-w-xs">{product.name}</span>
+        </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Images */}
-        <div className="space-y-4">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary/5">
-            <img
-              src={selectedImage}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = fallbackImage;
-              }}
-            />
-          </div>
-          {imageUrls.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {imageUrls.map((url, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImage(url)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === url ? 'border-primary' : 'border-transparent'
-                    }`}
-                >
-                  <img
-                    src={url}
-                    alt={`${product.name} ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = fallbackImage;
-                    }}
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Product Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">{product.name}</h1>
-            <div className="flex items-center gap-4 mb-2">
-              <p className="text-2xl font-bold text-primary">{product.price.toFixed(2)} €</p>
-              <EthicalScoreBadge score={product.ethicalScore} size="md" showLabel />
-            </div>
-          </div>
-
-          <p className="text-foreground/70 leading-relaxed">{product.description}</p>
-
-          {/* Shop Info */}
-          <div className="flex items-center gap-3 p-4 bg-secondary/5 rounded-xl">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-secondary/10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Images */}
+          <div className="space-y-6 animate-fade-in-up animation-delay-100">
+            <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white shadow-soft group border border-secondary/10">
               <img
-                src={product.shop?.profilePicture || 'https://placehold.co/100x100?text=Shop'}
-                alt={product.shop?.name || 'Boutique'}
-                className="w-full h-full object-cover"
+                src={selectedImage}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 onError={(e) => {
-                  e.currentTarget.src = 'https://placehold.co/100x100?text=Shop';
+                  e.currentTarget.src = fallbackImage;
                 }}
               />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground/60">Vendu par</p>
-              <Link
-                href={`/boutique/${product.shop?.id}`}
-                className="flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors"
-              >
-                <Store size={16} />
-                {product.shop?.name || 'Boutique'}
-              </Link>
-            </div>
-          </div>
-
-          {/* Quantity & Add to Cart */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-foreground">Quantité:</span>
-              <div className="flex items-center gap-2 bg-secondary/10 rounded-lg p-1">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-1.5 hover:bg-white rounded-md transition-colors text-foreground/70"
-                >
-                  -
-                </button>
-                <span className="w-8 text-center font-medium">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-1.5 hover:bg-white rounded-md transition-colors text-foreground/70"
-                >
-                  +
+              <div className="absolute top-4 right-4 z-10">
+                <button className="p-3 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:scale-110 transition-transform text-foreground/60 hover:text-red-500">
+                  <Heart className="w-6 h-6" />
                 </button>
               </div>
-            </div>
-
-            <Button
-              onClick={handleAddToCart}
-              disabled={cartLoading}
-              size="lg"
-              className="w-full h-14 text-lg group"
-            >
-              <ShoppingCart className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
-              {cartLoading ? 'Ajout...' : 'Ajouter au panier'}
-            </Button>
-          </div>
-
-          {/* Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-secondary/10">
-            <div className="flex flex-col items-center text-center p-3">
-              <Truck className="w-6 h-6 text-primary mb-2" />
-              <span className="text-xs font-medium">Livraison rapide</span>
-            </div>
-            <div className="flex flex-col items-center text-center p-3">
-              <Shield className="w-6 h-6 text-primary mb-2" />
-              <span className="text-xs font-medium">Paiement sécurisé</span>
-            </div>
-            <div className="flex flex-col items-center text-center p-3">
-              <Leaf className="w-6 h-6 text-primary mb-2" />
-              <span className="text-xs font-medium">Éco-responsable</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Reviews Section */}
-      <div className="mt-16 border-t border-secondary/20 pt-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
-                <MessageSquare className="w-6 h-6" />
-                Avis des clients
-              </h2>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  {renderStars(Math.round(calculateAverageRating()), 'w-5 h-5')}
-                  <span className="font-semibold text-lg">
-                    {calculateAverageRating().toFixed(1)}
-                  </span>
+              {product.ethicalScore && (
+                <div className="absolute top-4 left-4 z-10">
+                  <EthicalScoreBadge score={product.ethicalScore} size="lg" showLabel />
                 </div>
-                <span className="text-foreground/60">
-                  ({reviews.length} avis{reviews.length > 1 ? 's' : ''})
-                </span>
-              </div>
+              )}
             </div>
-
-            {user && (
-              <Button
-                onClick={() => setShowReviewForm(!showReviewForm)}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Star className="w-4 h-4" />
-                {userReview ? 'Modifier mon avis' : 'Donner mon avis'}
-              </Button>
+            {imageUrls.length > 1 && (
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                {imageUrls.map((url, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(url)}
+                    className={`flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shadow-sm hover:scale-105 ${selectedImage === url ? 'border-primary ring-2 ring-primary/20' : 'border-transparent'
+                      }`}
+                  >
+                    <img
+                      src={url}
+                      alt={`${product.name} ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = fallbackImage;
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Review Form */}
-          {showReviewForm && user && (
-            <div className="bg-secondary/5 rounded-xl p-6 mb-8">
-              <h3 className="font-semibold mb-4">
-                {userReview ? 'Modifier votre avis' : 'Donner votre avis'}
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Note</label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <button
-                        key={rating}
-                        onClick={() => setNewReview(prev => ({ ...prev, rating }))}
-                        className="p-1"
-                      >
-                        <Star
-                          className={`w-8 h-8 ${rating <= newReview.rating
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-gray-300 hover:text-yellow-200'
-                            } transition-colors`}
-                        />
-                      </button>
-                    ))}
+          {/* Product Info */}
+          <div className="space-y-8 animate-fade-in-up animation-delay-200">
+            <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-8 border border-white/50 shadow-soft">
+              <div className="mb-6">
+                <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4 leading-tight">{product.name}</h1>
+                <div className="flex items-center gap-6">
+                  <p className="text-3xl font-bold text-primary">{product.price.toFixed(2)} €</p>
+                  <div className="flex items-center gap-2 bg-yellow-500/10 px-3 py-1 rounded-full">
+                    {renderStars(Math.round(calculateAverageRating()), 'w-4 h-4')}
+                    <span className="text-sm font-bold text-yellow-700 ml-1">{calculateAverageRating().toFixed(1)}</span>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Commentaire</label>
-                  <textarea
-                    value={newReview.comment}
-                    onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
-                    placeholder="Partagez votre expérience avec ce produit..."
-                    className="w-full px-3 py-2 rounded-lg border border-secondary/30 bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                    rows={4}
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleSubmitReview}
-                    disabled={submittingReview || !newReview.comment.trim()}
-                    className="flex items-center gap-2"
-                  >
-                    <Star className="w-4 h-4" />
-                    {submittingReview ? 'Envoi...' : userReview ? 'Mettre à jour' : 'Publier'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowReviewForm(false);
-                      setNewReview({ rating: 5, comment: '' });
-                    }}
-                  >
-                    Annuler
-                  </Button>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Reviews List */}
-          {reviewsLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-foreground/60">Chargement des avis...</p>
-            </div>
-          ) : reviews.length === 0 ? (
-            <div className="text-center py-12">
-              <MessageSquare className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Aucun avis pour le moment</h3>
-              <p className="text-foreground/60 mb-6">
-                Soyez le premier à donner votre avis sur ce produit !
-              </p>
-              {!user && (
-                <Button onClick={() => router.push('/login')}>
-                  Se connecter pour donner un avis
+              <p className="text-lg text-foreground/70 leading-relaxed mb-8">{product.description}</p>
+
+              {/* Shop Info */}
+              <div className="flex items-center gap-4 p-4 bg-white/80 rounded-2xl border border-secondary/10 shadow-sm hover:shadow-md transition-shadow mb-8 group">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-secondary/10">
+                  <img
+                    src={product.shop?.profilePicture || 'https://placehold.co/100x100?text=Shop'}
+                    alt={product.shop?.name || 'Boutique'}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://placehold.co/100x100?text=Shop';
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-foreground/60 font-medium mb-1">Vendu et expédié par</p>
+                  <Link
+                    href={`/boutique/${product.shop?.id}`}
+                    className="flex items-center gap-2 font-heading font-bold text-lg text-foreground hover:text-primary transition-colors"
+                  >
+                    <Store className="w-5 h-5" />
+                    {product.shop?.name || 'Boutique Partenaire'}
+                  </Link>
+                </div>
+                <Button variant="outline" size="sm" className="rounded-xl">
+                  Voir la boutique
                 </Button>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {reviews.map((review) => (
-                <div key={review.id} className="bg-white rounded-xl border border-secondary/20 p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary/10">
-                        {review.user.profilePicture ? (
-                          <img
-                            src={review.user.profilePicture}
-                            alt={review.user.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <UserIcon className="w-5 h-5 text-foreground/60" />
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">{review.user.name}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex">
-                            {renderStars(review.rating, 'w-4 h-4')}
-                          </div>
-                          <span className="text-sm text-foreground/60">
-                            {new Date(review.createdAt).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {review.userId === user?.id && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setShowReviewForm(true);
-                          setNewReview({
-                            rating: review.rating,
-                            comment: review.comment || ''
-                          });
-                        }}
-                      >
-                        Modifier
-                      </Button>
-                    )}
-                  </div>
+              </div>
 
-                  {review.comment && (
-                    <p className="text-foreground/80 mb-4 leading-relaxed">
-                      {review.comment}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-4 pt-4 border-t border-secondary/10">
+              {/* Actions */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-3 bg-white rounded-xl p-2 shadow-sm border border-secondary/10">
                     <button
-                      onClick={() => handleHelpfulVote(review.id)}
-                      className="flex items-center gap-2 text-sm text-foreground/60 hover:text-primary transition-colors"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-secondary/10 rounded-lg transition-colors text-foreground font-bold text-lg"
                     >
-                      <ThumbsUp className="w-4 h-4" />
-                      Utile ({review.helpfulCount})
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-lg">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-secondary/10 rounded-lg transition-colors text-foreground font-bold text-lg"
+                    >
+                      +
                     </button>
                   </div>
+
+                  <div className="text-sm text-foreground/60">
+                    <span className="block font-medium text-green-600 flex items-center gap-1">
+                      <Leaf className="w-3 h-3" /> En stock
+                    </span>
+                    <span>Expédié sous 48h</span>
+                  </div>
                 </div>
-              ))}
+
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={cartLoading}
+                  size="lg"
+                  className="w-full h-16 text-lg font-bold rounded-2xl shadow-glow hover:shadow-glow-accent hover:-translate-y-1 transition-all"
+                >
+                  <ShoppingCart className="mr-3 w-6 h-6" />
+                  {cartLoading ? 'Ajout en cours...' : 'Ajouter au panier'}
+                </Button>
+              </div>
             </div>
-          )}
+
+            {/* Features Reassurance */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col items-center text-center p-4 bg-white/40 rounded-2xl border border-white/60 backdrop-blur-sm">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                  <Truck className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wide text-foreground/80">Livraison rapide</span>
+              </div>
+              <div className="flex flex-col items-center text-center p-4 bg-white/40 rounded-2xl border border-white/60 backdrop-blur-sm">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                  <Shield className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wide text-foreground/80">Paiement sécurisé</span>
+              </div>
+              <div className="flex flex-col items-center text-center p-4 bg-white/40 rounded-2xl border border-white/60 backdrop-blur-sm">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                  <Leaf className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wide text-foreground/80">Éco-responsable</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-24 border-t border-secondary/10 pt-16">
+          <div className="relative">
+            <div className="absolute inset-x-0 -top-40 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+
+            <div className="max-w-4xl mx-auto">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+                <div>
+                  <h2 className="text-3xl font-heading font-bold text-foreground mb-3 flex items-center gap-3">
+                    <MessageSquare className="w-8 h-8 text-primary" />
+                    Avis clients
+                  </h2>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm border border-secondary/10">
+                      {renderStars(Math.round(calculateAverageRating()), 'w-5 h-5')}
+                      <span className="font-bold text-lg text-foreground ml-2">
+                        {calculateAverageRating().toFixed(1)}
+                      </span>
+                    </div>
+                    <span className="text-foreground/60 font-medium">
+                      Basé sur {reviews.length} avis
+                    </span>
+                  </div>
+                </div>
+
+                {user && (
+                  <Button
+                    onClick={() => setShowReviewForm(!showReviewForm)}
+                    variant="outline"
+                    className="flex items-center gap-2 rounded-xl py-6 px-6 border-2 hover:bg-secondary/5 hover:border-primary/30"
+                  >
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    {userReview ? 'Modifier mon avis' : 'Partager mon expérience'}
+                  </Button>
+                )}
+              </div>
+
+              {/* Review Form */}
+              {showReviewForm && user && (
+                <div className="bg-white rounded-[2rem] p-8 mb-12 border border-secondary/20 shadow-lg animate-fade-in-scale">
+                  <h3 className="font-heading font-bold text-xl mb-6">
+                    {userReview ? 'Votre avis compte' : 'Racontez-nous tout'}
+                  </h3>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-bold mb-3 uppercase tracking-wide text-foreground/70">Votre note</label>
+                      <div className="flex gap-4">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            onClick={() => setNewReview(prev => ({ ...prev, rating }))}
+                            className="p-1 hover:scale-110 transition-transform"
+                          >
+                            <Star
+                              className={`w-10 h-10 ${rating <= newReview.rating
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-200 hover:text-yellow-200'
+                                } transition-colors`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold mb-3 uppercase tracking-wide text-foreground/70">Votre commentaire</label>
+                      <textarea
+                        value={newReview.comment}
+                        onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
+                        placeholder="Qu'avez-vous pensé de ce produit ? Qualité, livraison, emballage..."
+                        className="w-full px-5 py-4 rounded-2xl border-2 border-secondary/10 bg-secondary/5 focus:outline-none focus:border-primary/30 focus:bg-white transition-all resize-none"
+                        rows={4}
+                      />
+                    </div>
+                    <div className="flex gap-4 pt-2">
+                      <Button
+                        onClick={handleSubmitReview}
+                        disabled={submittingReview || !newReview.comment.trim()}
+                        className="flex items-center gap-2 rounded-xl px-8 shadow-glow"
+                      >
+                        {submittingReview ? 'Publication...' : userReview ? 'Mettre à jour' : 'Publier mon avis'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setShowReviewForm(false);
+                          setNewReview({ rating: 5, comment: '' });
+                        }}
+                        className="rounded-xl"
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              {reviewsLoading ? (
+                <div className="flex flex-col items-center py-12">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4"></div>
+                  <p className="text-foreground/60">Récupération des avis...</p>
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="text-center py-16 bg-white/50 rounded-[2rem] border border-dashed border-secondary/20">
+                  <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-foreground/30">
+                    <MessageSquare className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-xl font-heading font-bold mb-2">Aucun avis pour le moment</h3>
+                  <p className="text-foreground/60 mb-8 max-w-md mx-auto">
+                    Ce produit attend son premier fan. Soyez celui qui lancera la tendance !
+                  </p>
+                  {!user && (
+                    <Button onClick={() => router.push('/login')} variant="outline" className="rounded-xl">
+                      Se connecter pour donner un avis
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="bg-white/80 backdrop-blur-sm rounded-[2rem] p-8 border border-secondary/10 hover:shadow-lg transition-all shadow-sm">
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-secondary/10 border-2 border-white shadow-sm">
+                            {review.user.profilePicture ? (
+                              <img
+                                src={review.user.profilePicture}
+                                alt={review.user.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <UserIcon className="w-6 h-6 text-foreground/40" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground text-lg">{review.user.name}</p>
+                            <div className="flex items-center gap-3">
+                              <div className="flex">
+                                {renderStars(review.rating, 'w-4 h-4')}
+                              </div>
+                              <span className="text-sm text-foreground/40 font-medium">
+                                {new Date(review.createdAt).toLocaleDateString('fr-FR', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {review.userId === user?.id && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-foreground/40 hover:text-primary rounded-full px-4"
+                            onClick={() => {
+                              setShowReviewForm(true);
+                              setNewReview({
+                                rating: review.rating,
+                                comment: review.comment || ''
+                              });
+                            }}
+                          >
+                            Modifier
+                          </Button>
+                        )}
+                      </div>
+
+                      {review.comment && (
+                        <div className="bg-secondary/5 rounded-2xl p-6 mb-6">
+                          <p className="text-foreground/80 leading-relaxed text-lg italic">
+                            "{review.comment}"
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => handleHelpfulVote(review.id)}
+                          className="flex items-center gap-2 text-sm font-bold text-foreground/50 hover:text-primary transition-colors bg-white px-4 py-2 rounded-full border border-secondary/10 hover:border-primary/20"
+                        >
+                          <ThumbsUp className="w-4 h-4" />
+                          Utile ({review.helpfulCount})
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </AnimatedBackground>
   );
 }

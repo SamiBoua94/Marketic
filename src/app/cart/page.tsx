@@ -39,7 +39,10 @@ function normalizeImageUrls(images: unknown): string[] {
     return [];
 }
 
+import { useRouter } from 'next/navigation';
+
 export default function CartPage() {
+    const router = useRouter();
     const { items, removeItem, updateQuantity, totalPrice, totalItems, isLoading, clearCart } = useCart();
     const { user } = useAuth();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -119,10 +122,8 @@ export default function CartPage() {
             // Vider le panier
             await clearCart();
 
-            // Afficher le succès
-            setOrderSuccess(true);
-            setShowCheckoutForm(false);
-            setCheckoutStep('shipping');
+            // Rediriger vers la page de succès
+            router.push('/checkout/success');
         } catch (error: any) {
             setOrderError(error.message || 'Une erreur est survenue lors de la validation de la commande');
         } finally {
@@ -361,7 +362,7 @@ export default function CartPage() {
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${checkoutStep === 'shipping' ? 'bg-primary text-white' :
-                                                checkoutStep === 'payment' || checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                            checkoutStep === 'payment' || checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
                                             }`}>
                                             {checkoutStep === 'shipping' ? '1' : checkoutStep === 'payment' || checkoutStep === 'review' ? '✓' : '1'}
                                         </div>
@@ -371,7 +372,7 @@ export default function CartPage() {
                                         }`} />
                                     <div className="flex items-center">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${checkoutStep === 'payment' ? 'bg-primary text-white' :
-                                                checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                            checkoutStep === 'review' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
                                             }`}>
                                             {checkoutStep === 'payment' ? '2' : checkoutStep === 'review' ? '✓' : '2'}
                                         </div>

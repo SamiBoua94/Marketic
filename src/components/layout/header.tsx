@@ -1,8 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare, BarChart3, Heart } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { ShoppingBag, Search, Menu, Leaf, User, LogOut, ChevronDown, Store, Package, Headphones, MessageSquare, BarChart3, Heart, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { useCart } from '@/context/cart-context';
@@ -10,6 +10,7 @@ import { useState, useRef, useEffect } from 'react';
 
 export function Header() {
     const router = useRouter();
+    const pathname = usePathname();
     const { user, loading, logout } = useAuth();
     const { totalItems } = useCart();
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -18,6 +19,11 @@ export function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // Close mobile menu when route changes
+    useEffect(() => {
+        setMobileMenuOpen(false);
+    }, [pathname]);
 
     // Handle search submission - navigate to search page
     const handleSearch = () => {
@@ -77,15 +83,9 @@ export function Header() {
                     <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
                         Catalogue
                     </Link>
-                    <Link href="/services" className="text-sm font-medium hover:text-primary transition-colors">
-                        Services
-                    </Link>
                     <Link href="/boutiques" className="text-sm font-medium hover:text-primary transition-colors">
                         Boutiques
                     </Link>
-                    {/* <Link href="/chat-ia" className="text-sm font-medium hover:text-primary transition-colors">
-                        Demander à l'IA
-                    </Link> */}
                 </nav>
 
                 {/* Actions */}
@@ -204,6 +204,14 @@ export function Header() {
                                             Support
                                         </Link>
                                     )}
+                                    <Link
+                                        href="/services"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
+                                    >
+                                        <Zap className="w-4 h-4" />
+                                        Services
+                                    </Link>
                                     <button
                                         onClick={handleLogout}
                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -238,16 +246,10 @@ export function Header() {
                         <Link href="/products" className="block text-sm font-medium hover:text-primary transition-colors py-2">
                             Catalogue
                         </Link>
-                        <Link href="/services" className="block text-sm font-medium hover:text-primary transition-colors py-2">
-                            Services
-                        </Link>
                         <Link href="/boutiques" className="block text-sm font-medium hover:text-primary transition-colors py-2">
                             Boutiques
                         </Link>
-                        {/* <Link href="/chat-ia" className="block text-sm font-medium hover:text-primary transition-colors py-2">
-                            Demander à l'IA
-                        </Link> */}
-                        
+
                         {!user && (
                             <>
                                 <div className="border-t border-secondary/10 pt-3 mt-3 space-y-2">

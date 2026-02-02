@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import Link from 'next/link';
+import { Search, Store, MapPin, ArrowRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 interface Shop {
   id: string;
@@ -27,7 +27,6 @@ export default function BoutiquesPage() {
       try {
         const response = await fetch(`/api/shops?query=${searchQuery}`);
         const result = await response.json();
-        // API returns { success: true, data: [...] } via successResponse()
         setShops(result.data || []);
       } catch (error) {
         console.error('Error fetching shops:', error);
@@ -45,322 +44,121 @@ export default function BoutiquesPage() {
   }, [searchQuery]);
 
   return (
-    <div style={{
-      maxWidth: '1280px',
-      margin: '0 auto',
-      padding: '2rem 1rem',
-      minHeight: 'calc(100vh - 4rem)'
-    }}>
-      <style jsx global>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        width: '100%',
-        padding: '0 0.5rem'
-      }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          marginBottom: '2.5rem'
-        }}>
-          <h1 style={{
-            fontSize: '2.25rem',
-            fontWeight: '700',
-            margin: 0,
-            color: 'var(--foreground)',
-            lineHeight: '1.2'
-          }}>Découvrez nos boutiques partenaires</h1>
-          <p style={{
-            color: 'var(--muted-foreground)',
-            margin: 0,
-            maxWidth: '600px',
-            lineHeight: '1.6'
-          }}>
-            Explorez notre sélection de boutiques locales et trouvez des produits uniques près de chez vous.
-          </p>
-          <div style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: '32rem',
-            marginTop: '0.5rem'
-          }}>
-            <Search style={{
-              position: 'absolute',
-              left: '1rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              height: '1.25rem',
-              width: '1.25rem',
-              color: 'var(--muted-foreground)'
-            }} />
-            <input
-              type="text"
-              placeholder="Rechercher une boutique par nom..."
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem 0.75rem 2.75rem',
-                borderRadius: '0.5rem',
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--background)',
-                color: 'var(--foreground)',
-                fontSize: '1rem',
-                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                transition: 'all 0.2s ease',
-                outline: 'none'
-              }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-primary/5 via-background to-secondary/5 border-b border-secondary/20">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-4">
+              Découvrez nos boutiques
+            </h1>
+            <p className="text-lg text-foreground/60 mb-8">
+              Explorez notre sélection de boutiques locales et trouvez des produits uniques près de chez vous.
+            </p>
+
+            {/* Search Bar */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
+              <input
+                type="text"
+                placeholder="Rechercher une boutique..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white border border-secondary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all shadow-sm"
+              />
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Shops Grid */}
+      <div className="container mx-auto px-4 py-12">
         {isLoading ? (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '1.5rem',
-            marginTop: '1.5rem',
-            width: '100%',
-            padding: '0 0.5rem'
-          }}>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} style={{
-                border: '1px solid var(--border)',
-                borderRadius: '0.5rem',
-                overflow: 'hidden',
-                backgroundColor: 'var(--card)',
-                color: 'var(--card-foreground)'
-              }}>
-                <div style={{
-                  height: '12rem',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: '0.5rem 0.5rem 0 0',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                }} />
-                <div style={{ padding: '1.5rem' }}>
-                  <div style={{
-                    height: '1.5rem',
-                    backgroundColor: 'var(--muted)',
-                    borderRadius: '0.25rem',
-                    width: '75%',
-                    marginBottom: '0.5rem',
-                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                  }} />
-                  <div style={{
-                    height: '1rem',
-                    backgroundColor: 'var(--muted)',
-                    borderRadius: '0.25rem',
-                    width: '50%',
-                    marginBottom: '1rem',
-                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                  }} />
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            <p className="text-foreground/50 animate-pulse font-medium">
+              Chargement des boutiques...
+            </p>
           </div>
-        ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '1.75rem',
-            marginTop: '1.5rem',
-            width: '100%',
-            padding: '0 0.5rem'
-          }}>
-            {shops.map((shop) => (
-              <div
-                key={shop.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: '0.75rem',
-                  overflow: 'hidden',
-                  backgroundColor: 'var(--card)',
-                  color: 'var(--card-foreground)',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.05)'
-                }}
-              >
-                  <div style={{
-                    height: '12rem',
-                    backgroundColor: 'var(--muted)',
-                    overflow: 'hidden',
-                    position: 'relative',
-                    borderBottom: '1px solid var(--border)'
-                  }}>
+        ) : shops.length > 0 ? (
+          <>
+            <p className="text-foreground/50 text-sm mb-6">
+              <span className="font-bold text-foreground">{shops.length}</span> boutique{shops.length > 1 ? 's' : ''} trouvée{shops.length > 1 ? 's' : ''}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {shops.map((shop) => (
+                <div
+                  key={shop.id}
+                  className="bg-white rounded-2xl border border-secondary/20 overflow-hidden hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col group"
+                >
+                  {/* Shop Image */}
+                  <div className="h-48 bg-secondary/10 overflow-hidden relative">
                     {shop.profilePicture || shop.bannerPicture ? (
-                      <div style={{
-                        width: '100%',
-                        height: '100%',
-                        overflow: 'hidden'
-                      }}>
-                        <img
-                          src={shop.profilePicture || shop.bannerPicture || ''}
-                          alt={shop.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.5s ease',
-                            transform: 'scale(1)'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'scale(1.05)';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'scale(1)';
-                          }}
-                        />
-                      </div>
+                      <img
+                        src={shop.profilePicture || shop.bannerPicture || ''}
+                        alt={shop.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://placehold.co/400x300?text=Boutique';
+                        }}
+                      />
                     ) : (
-                      <div style={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'var(--muted)',
-                        padding: '1.5rem',
-                        textAlign: 'center'
-                      }}>
-                        <div style={{
-                          width: '3rem',
-                          height: '3rem',
-                          borderRadius: '50%',
-                          backgroundColor: 'var(--muted-foreground)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginBottom: '1rem',
-                          opacity: 0.5
-                        }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--background)' }}>
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                          </svg>
+                      <div className="w-full h-full flex flex-col items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mb-3">
+                          <Store className="w-8 h-8 text-foreground/30" />
                         </div>
-                        <span style={{
-                          color: 'var(--muted-foreground)',
-                          fontSize: '0.875rem'
-                        }}>
-                          Aucune image disponible
-                        </span>
+                        <span className="text-sm text-foreground/40">Aucune image</span>
                       </div>
                     )}
                   </div>
-                  <div style={{
-                    padding: '1.5rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flex: '1'
-                  }}>
-                    <div style={{ flex: '1' }}>
-                      <h3 style={{
-                        fontSize: '1.25rem',
-                        fontWeight: '600',
-                        margin: '0 0 0.5rem 0',
-                        color: 'var(--foreground)',
-                        lineHeight: '1.3'
-                      }}>
-                        {shop.name}
-                      </h3>
-                      {shop.description && (
-                        <p style={{
-                          fontSize: '0.875rem',
-                          color: 'var(--muted-foreground)',
-                          margin: '0 0 0.75rem 0',
-                          lineHeight: '1.5',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}>
-                          {shop.description}
-                        </p>
-                      )}
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        margin: '0.75rem 0 1rem 0',
-                        color: 'var(--muted-foreground)'
-                      }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                          <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                        <span style={{
-                          fontSize: '0.875rem',
-                          lineHeight: '1.4',
-                          flex: '1',
-                          minWidth: 0,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}>
+
+                  {/* Shop Info */}
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-heading font-bold text-lg text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {shop.name}
+                    </h3>
+
+                    {shop.description && (
+                      <p className="text-sm text-foreground/60 line-clamp-2 mb-3">
+                        {shop.description}
+                      </p>
+                    )}
+
+                    {(shop.address || shop.city) && (
+                      <div className="flex items-center gap-2 text-foreground/50 text-sm mb-4">
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">
                           {[shop.address, shop.postalCode, shop.city].filter(Boolean).join(', ')}
                         </span>
                       </div>
-                    </div>
-                    <button
-                      type="button"
+                    )}
+
+                    <Button
                       onClick={() => router.push(`/boutique/${shop.id}`)}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '0.5rem',
-                        backgroundColor: '#3a5a40',
-                        color: '#ffffff',
-                        fontWeight: 500,
-                        fontSize: '0.9375rem',
-                        lineHeight: '1.5',
-                        padding: '0.625rem 1.25rem',
-                        width: '100%',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        marginTop: 'auto',
-                        outline: 'none',
-                        boxShadow: 'none'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#2d4533';
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#3a5a40';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.backgroundColor = '#3a5a40';
-                        e.currentTarget.style.outline = 'none';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.backgroundColor = '#3a5a40';
-                        e.currentTarget.style.outline = 'none';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
+                      className="mt-auto w-full"
                     >
-                      <span>Voir la boutique</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '0.5rem' }}>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                      </svg>
-                    </button>
+                      Voir la boutique
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
                   </div>
                 </div>
-            ))}
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="py-24 text-center bg-secondary/5 rounded-3xl border border-dashed border-secondary/20">
+            <div className="inline-flex p-6 bg-white rounded-full mb-6">
+              <Store className="w-12 h-12 text-foreground/20" />
+            </div>
+            <h2 className="text-2xl font-heading font-bold text-foreground mb-2">
+              Aucune boutique trouvée
+            </h2>
+            <p className="text-foreground/50 max-w-sm mx-auto">
+              {searchQuery
+                ? `Aucune boutique ne correspond à "${searchQuery}"`
+                : "Il n'y a pas encore de boutiques sur la plateforme."
+              }
+            </p>
           </div>
         )}
       </div>
