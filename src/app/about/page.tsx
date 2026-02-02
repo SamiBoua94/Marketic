@@ -2,7 +2,7 @@
 
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
-import { Leaf, Heart, Shield, Users, Zap, Globe, Eye, Ban, AlertTriangle, Lock, Copy } from 'lucide-react';
+import { Leaf, Heart, Shield, Users, Zap, Globe, Eye, Ban, AlertTriangle, Lock, Copy, Euro, Database } from 'lucide-react';
 import Link from 'next/link';
 
 export default function About() {
@@ -31,11 +31,11 @@ export default function About() {
                                     Découvrir les boutiques
                                 </Button>
                             </Link>
-                            <Link href="/chat-ia">
+                            {/* <Link href="/chat-ia">
                                 <Button variant="outline" size="lg" className="px-8">
                                     Demander à l'IA
                                 </Button>
-                            </Link>
+                            </Link> */}
                         </div>
                     </div>
                 </section>
@@ -103,11 +103,12 @@ export default function About() {
                                     <div className="p-2 bg-blue-100 rounded-lg">
                                         <Globe className="w-6 h-6 text-blue-600" />
                                     </div>
-                                    <h3 className="text-xl font-semibold">IA Intelligente</h3>
+                                    <h3 className="text-xl font-semibold">Alternative éthique</h3>
                                 </div>
                                 <p className="text-muted-foreground mb-4">
-                                    Notre intelligence artificielle vous aide à trouver les produits qui correspondent vraiment
-                                    à vos valeurs et à vos besoins.
+                                    Notre plateforme vous met en relation directe avec des créateurs et producteurs locaux 
+                                    qui partagent vos valeurs éthiques et environnementales. Chaque achat soutient une économie 
+                                    plus juste et transparente.
                                 </p>
                                 <ul className="space-y-2 text-sm text-muted-foreground">
                                     <li>• Recommandations personnalisées</li>
@@ -169,6 +170,30 @@ export default function About() {
                                     <p className="text-muted-foreground">
                                         Nous démocratisons les outils technologiques pour que
                                         chaque commerçant puisse vendre en ligne facilement.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="p-3 bg-primary/10 rounded-lg h-fit">
+                                    <Euro className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2">Tarifs les plus bas</h3>
+                                    <p className="text-muted-foreground">
+                                        Nous garantissons les commissions les plus compétitives du marché
+                                        pour permettre aux vendeurs de maximiser leurs revenus.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="p-3 bg-primary/10 rounded-lg h-fit">
+                                    <Database className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2">Données respectueuses</h3>
+                                    <p className="text-muted-foreground">
+                                        Avec votre consentement, nous pouvons revendre certaines données
+                                        anonymisées dans le strict respect du RGPD et de votre vie privée.
                                     </p>
                                 </div>
                             </div>

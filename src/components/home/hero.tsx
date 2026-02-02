@@ -28,12 +28,12 @@ export function Hero() {
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                     <Link href="/boutiques">
                         <Button size="lg" className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                            Découvrir les créateurs  <ArrowRight className="w-5 h-5" />
+                            Découvrir les boutiques  <ArrowRight className="w-5 h-5" />
                         </Button>
                     </Link>
-                    <Link href="/login">
+                    <Link href="/products">
                         <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                            Vendre mes créations
+                            Acheter des produits
                         </Button>
                     </Link>
                 </div>

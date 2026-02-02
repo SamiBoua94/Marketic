@@ -161,14 +161,6 @@ export function Header() {
                                         Mon Profil
                                     </Link>
                                     <Link
-                                        href="/messages"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
-                                    >
-                                        <MessageSquare className="w-4 h-4" />
-                                        Messagerie
-                                    </Link>
-                                    <Link
                                         href="/follows"
                                         onClick={() => setDropdownOpen(false)}
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-secondary/10 transition-colors"
